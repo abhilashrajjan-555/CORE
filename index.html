@@ -1,160 +1,155 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>C.O.R.E. Workflow Console</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="assets/styles.css" />
-  </head>
-  <body>
-    <header class="app-header">
-      <div>
-        <h1>C.O.R.E. Workflow</h1>
-        <p>Capture · Organize · Review · Engage</p>
-      </div>
-      <div class="header-actions">
-        <button id="export-data">Export JSON</button>
-        <label class="import-label">
-          Import JSON
-          <input type="file" id="import-data" accept="application/json" />
-        </label>
-      </div>
-    </header>
 
-    <main class="panels">
-      <section class="panel" id="capture-panel">
-        <div class="panel-header">
-          <h2>Capture</h2>
-          <p>Universal Inbox + quick capture</p>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>C.O.R.E. Workflow Console</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/styles.css" />
+</head>
+
+<body>
+  <header class="app-header">
+    <div>
+      <h1>C.O.R.E. Workflow</h1>
+      <p>Capture · Organize · Review · Engage</p>
+    </div>
+    <div class="header-actions">
+      <button id="export-data">Export JSON</button>
+      <label class="import-label">
+        Import JSON
+        <input type="file" id="import-data" accept="application/json" />
+      </label>
+    </div>
+  </header>
+
+  <main class="panels">
+    <section class="panel" id="capture-panel">
+      <div class="panel-header">
+        <h2>Capture</h2>
+        <p>Universal Inbox + quick capture</p>
+      </div>
+      <form id="capture-form">
+        <div class="field">
+          <label for="entry-title">Title</label>
+          <input id="entry-title" name="title" placeholder="Short descriptive title" required />
         </div>
-        <form id="capture-form">
-          <div class="field">
-            <label for="entry-title">Title</label>
-            <input id="entry-title" name="title" placeholder="Short descriptive title" required />
+        <div class="field">
+          <label for="entry-type">Type</label>
+          <select id="entry-type" name="type">
+            <option value="task">Task</option>
+            <option value="idea">Idea</option>
+            <option value="note">Note</option>
+            <option value="media">Media</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="entry-body">Details</label>
+          <textarea id="entry-body" name="body" rows="4" placeholder="Drop thoughts, meeting notes, links…"></textarea>
+        </div>
+        <div class="field split">
+          <div>
+            <label for="entry-due">Due</label>
+            <input type="date" id="entry-due" name="due" />
           </div>
-          <div class="field">
-            <label for="entry-type">Type</label>
-            <select id="entry-type" name="type">
-              <option value="task">Task</option>
-              <option value="idea">Idea</option>
-              <option value="note">Note</option>
-              <option value="media">Media</option>
+          <div>
+            <label for="entry-effort">Est. mins</label>
+            <input type="number" id="entry-effort" name="effort" min="1" />
+          </div>
+          <div>
+            <label for="entry-energy">Energy</label>
+            <select id="entry-energy" name="energy">
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+              <option value="low">Low</option>
             </select>
           </div>
-          <div class="field">
-            <label for="entry-body">Details</label>
-            <textarea
-              id="entry-body"
-              name="body"
-              rows="4"
-              placeholder="Drop thoughts, meeting notes, links…"
-            ></textarea>
+        </div>
+        <div class="field split">
+          <div>
+            <label for="entry-area">Area</label>
+            <select id="entry-area" name="area"></select>
           </div>
-          <div class="field split">
-            <div>
-              <label for="entry-due">Due</label>
-              <input type="date" id="entry-due" name="due" />
-            </div>
-            <div>
-              <label for="entry-effort">Est. mins</label>
-              <input type="number" id="entry-effort" name="effort" min="1" />
-            </div>
-            <div>
-              <label for="entry-energy">Energy</label>
-              <select id="entry-energy" name="energy">
-                <option value="medium">Medium</option>
-                <option value="high">High</option>
-                <option value="low">Low</option>
-              </select>
-            </div>
+          <div>
+            <label for="entry-project">Project</label>
+            <select id="entry-project" name="project"></select>
           </div>
-          <div class="field split">
-            <div>
-              <label for="entry-area">Area</label>
-              <select id="entry-area" name="area"></select>
-            </div>
-            <div>
-              <label for="entry-project">Project</label>
-              <select id="entry-project" name="project"></select>
-            </div>
-          </div>
-          <div class="field">
-            <label for="entry-tags">Tags (comma separated)</label>
-            <input id="entry-tags" name="tags" placeholder="meeting, follow-up" />
-          </div>
-          <div class="field">
-            <label for="entry-next-action">Next Action</label>
-            <input id="entry-next-action" name="nextAction" placeholder="Verb + object" />
-          </div>
-          <button type="submit" class="primary">Capture</button>
-        </form>
+        </div>
+        <div class="field">
+          <label for="entry-tags">Tags (comma separated)</label>
+          <input id="entry-tags" name="tags" placeholder="meeting, follow-up" />
+        </div>
+        <div class="field">
+          <label for="entry-next-action">Next Action</label>
+          <input id="entry-next-action" name="nextAction" placeholder="Verb + object" />
+        </div>
+        <button type="submit" class="primary">Capture</button>
+      </form>
 
-        <div class="panel-subsection">
-          <h3>Inbox</h3>
-          <div id="inbox-list" class="card-list"></div>
-        </div>
-      </section>
+      <div class="panel-subsection">
+        <h3>Inbox</h3>
+        <div id="inbox-list" class="card-list"></div>
+      </div>
+    </section>
 
-      <section class="panel" id="organize-panel">
-        <div class="panel-header">
-          <h2>Organize</h2>
-          <p>PARA tree + assignment</p>
+    <section class="panel" id="organize-panel">
+      <div class="panel-header">
+        <h2>Organize</h2>
+        <p>PARA tree + assignment</p>
+      </div>
+      <div class="panel-subsection para-tree" id="para-tree"></div>
+      <div class="panel-subsection">
+        <h3>Context Filters</h3>
+        <div class="filters">
+          <button data-filter="all" class="active">All</button>
+          <button data-filter="task">Tasks</button>
+          <button data-filter="idea">Ideas</button>
+          <button data-filter="note">Notes</button>
+          <button data-filter="media">Media</button>
         </div>
-        <div class="panel-subsection para-tree" id="para-tree"></div>
-        <div class="panel-subsection">
-          <h3>Context Filters</h3>
-          <div class="filters">
-            <button data-filter="all" class="active">All</button>
-            <button data-filter="task">Tasks</button>
-            <button data-filter="idea">Ideas</button>
-            <button data-filter="note">Notes</button>
-            <button data-filter="media">Media</button>
-          </div>
-          <div id="organized-list" class="card-list"></div>
-        </div>
-      </section>
+        <div id="organized-list" class="card-list"></div>
+      </div>
+    </section>
 
-      <section class="panel" id="review-panel">
-        <div class="panel-header">
-          <h2>Review</h2>
-          <p>Daily + Weekly rituals</p>
+    <section class="panel" id="review-panel">
+      <div class="panel-header">
+        <h2>Review</h2>
+        <p>Daily + Weekly rituals</p>
+      </div>
+      <div class="panel-subsection">
+        <div class="ritual-header">
+          <h3>Daily Focus</h3>
+          <button id="complete-daily">Mark Done</button>
         </div>
-        <div class="panel-subsection">
-          <div class="ritual-header">
-            <h3>Daily Focus</h3>
-            <button id="complete-daily">Mark Done</button>
-          </div>
-          <div id="daily-review" class="card-list"></div>
+        <div id="daily-review" class="card-list"></div>
+      </div>
+      <div class="panel-subsection">
+        <div class="ritual-header">
+          <h3>Weekly Radar</h3>
+          <button id="complete-weekly">Mark Done</button>
         </div>
-        <div class="panel-subsection">
-          <div class="ritual-header">
-            <h3>Weekly Radar</h3>
-            <button id="complete-weekly">Mark Done</button>
-          </div>
-          <div id="weekly-review" class="card-list"></div>
-        </div>
-      </section>
-    </main>
+        <div id="weekly-review" class="card-list"></div>
+      </div>
+    </section>
+  </main>
 
-    <template id="object-card-template">
-      <article class="object-card">
-        <div class="card-meta">
-          <span class="pill type-pill"></span>
-          <span class="pill status-pill"></span>
-        </div>
-        <h4 class="object-title"></h4>
-        <p class="object-body"></p>
-        <dl class="object-details"></dl>
-        <div class="card-actions"></div>
-      </article>
-    </template>
+  <template id="object-card-template">
+    <article class="object-card">
+      <div class="card-meta">
+        <span class="pill type-pill"></span>
+        <span class="pill status-pill"></span>
+      </div>
+      <h4 class="object-title"></h4>
+      <p class="object-body"></p>
+      <dl class="object-details"></dl>
+      <div class="card-actions"></div>
+    </article>
+  </template>
 
-    <script type="module" src="assets/app.js"></script>
-  </body>
+  <script type="module" src="assets/app.js"></script>
+</body>
+
 </html>

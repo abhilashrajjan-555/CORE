@@ -152,8 +152,62 @@ async function loadParaMetadata() {
     if (!response.ok) throw new Error('Failed to load PARA metadata');
     state.para = await response.json();
   } catch (error) {
-    console.warn(error);
-    state.para = { areas: [] };
+    console.warn('Failed to fetch para.json, using fallback data:', error);
+    // Fallback data for local file:// protocol (works locally and on GitHub Pages)
+    state.para = {
+      "areas": [
+        {
+          "id": "personal",
+          "name": "Personal Optimization",
+          "cadence": "weekly",
+          "keywords": ["wellness", "fitness", "habits"],
+          "projects": [
+            {
+              "id": "habit-tune-up",
+              "name": "Habit Tune-Up",
+              "goal": "Refresh routines for sleep, movement, mindfulness",
+              "deadline": null
+            }
+          ],
+          "resources": [
+            {
+              "id": "health-library",
+              "name": "Health Library"
+            }
+          ]
+        },
+        {
+          "id": "work",
+          "name": "Work and Career",
+          "cadence": "weekly",
+          "keywords": ["clients", "deliverables", "team"],
+          "projects": [
+            {
+              "id": "core-workflow",
+              "name": "C.O.R.E. System Build",
+              "goal": "Ship MVP automation stack",
+              "deadline": "2024-12-31"
+            },
+            {
+              "id": "thought-leadership",
+              "name": "Thought Leadership",
+              "goal": "Publish monthly insight pieces",
+              "deadline": null
+            }
+          ],
+          "resources": [
+            {
+              "id": "templates",
+              "name": "Templates"
+            },
+            {
+              "id": "research",
+              "name": "Research Vault"
+            }
+          ]
+        }
+      ]
+    };
   }
 }
 
@@ -171,7 +225,13 @@ function populateAreaProjectSelects() {
 }
 
 function bindEvents() {
+  if (!dom.captureForm) {
+    console.error('dom.captureForm is undefined!');
+    return;
+  }
+
   dom.captureForm.addEventListener('submit', handleCaptureSubmit);
+
   dom.filterButtons.forEach((btn) => {
     btn.addEventListener('click', () => {
       dom.filterButtons.forEach((b) => b.classList.remove('active'));
