@@ -5,14 +5,14 @@
   --bg-primary: #0a0e1a;
   --bg-secondary: #111827;
   --bg-tertiary: #1a1f35;
-  
+
   /* Gradient Accents */
   --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
   --gradient-success: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
   --gradient-warning: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
   --gradient-info: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
-  
+
   /* Vibrant Accent Colors */
   --accent-purple: #8b5cf6;
   --accent-pink: #ec4899;
@@ -20,35 +20,35 @@
   --accent-cyan: #06b6d4;
   --accent-emerald: #10b981;
   --accent-orange: #f97316;
-  
+
   /* Text Colors */
   --text-primary: #f9fafb;
   --text-secondary: #d1d5db;
   --text-muted: #9ca3af;
   --text-dim: #6b7280;
-  
+
   /* Glass Effect */
   --glass-bg: rgba(255, 255, 255, 0.05);
   --glass-border: rgba(255, 255, 255, 0.1);
   --glass-shadow: rgba(0, 0, 0, 0.3);
-  
+
   /* Type Pills */
   --pill-task: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   --pill-idea: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
   --pill-note: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
   --pill-media: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-  
+
   /* Shadows */
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
   --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.3);
   --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.4);
   --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.5);
-  
+
   /* Animations */
   --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-base: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  
+
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
@@ -78,7 +78,7 @@ body::before {
   left: -50%;
   width: 200%;
   height: 200%;
-  background: 
+  background:
     radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.15) 0%, transparent 50%),
     radial-gradient(circle at 80% 80%, rgba(236, 72, 153, 0.15) 0%, transparent 50%),
     radial-gradient(circle at 40% 20%, rgba(59, 130, 246, 0.1) 0%, transparent 50%);
@@ -87,9 +87,19 @@ body::before {
 }
 
 @keyframes backgroundShift {
-  0%, 100% { transform: translate(0, 0) rotate(0deg); }
-  33% { transform: translate(5%, 5%) rotate(5deg); }
-  66% { transform: translate(-5%, 5%) rotate(-5deg); }
+
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+
+  33% {
+    transform: translate(5%, 5%) rotate(5deg);
+  }
+
+  66% {
+    transform: translate(-5%, 5%) rotate(-5deg);
+  }
 }
 
 /* Header */
@@ -113,6 +123,7 @@ body::before {
     opacity: 0;
     transform: translateY(-20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -248,6 +259,7 @@ button.primary:hover {
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -304,6 +316,10 @@ button.primary:hover {
   background: var(--gradient-secondary);
 }
 
+#engage-panel::before {
+  background: var(--gradient-warning);
+}
+
 .panel-header h2 {
   font-family: 'Space Grotesk', sans-serif;
   font-size: 1.75rem;
@@ -324,6 +340,13 @@ button.primary:hover {
 
 #review-panel .panel-header h2 {
   background: var(--gradient-secondary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+#engage-panel .panel-header h2 {
+  background: var(--gradient-warning);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -387,7 +410,7 @@ form {
   gap: 1rem;
 }
 
-.field.split > div {
+.field.split>div {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -707,12 +730,12 @@ form {
     align-items: flex-start;
     padding: 1.5rem 2rem;
   }
-  
+
   .panels {
     grid-template-columns: 1fr;
     padding: 1.5rem 2rem 2rem;
   }
-  
+
   .app-header h1 {
     font-size: 1.75rem;
   }
@@ -722,16 +745,16 @@ form {
   .app-header {
     padding: 1rem 1.5rem;
   }
-  
+
   .panels {
     padding: 1rem 1.5rem 1.5rem;
     gap: 1.5rem;
   }
-  
+
   .panel {
     padding: 1.5rem;
   }
-  
+
   .field.split {
     flex-direction: column;
   }
@@ -739,9 +762,12 @@ form {
 
 /* Loading Animation */
 @keyframes pulse {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 1;
   }
+
   50% {
     opacity: 0.5;
   }
@@ -749,4 +775,107 @@ form {
 
 .loading {
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Toggle Button for Advanced Fields */
+.toggle-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  font-weight: 500;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  justify-content: center;
+}
+
+.toggle-btn:hover {
+  background: rgba(139, 92, 246, 0.1);
+  border-color: var(--accent-purple);
+  color: var(--text-primary);
+}
+
+#toggle-icon {
+  transition: transform var(--transition-base);
+  display: inline-block;
+  font-size: 0.75rem;
+}
+
+#toggle-icon.expanded {
+  transform: rotate(90deg);
+}
+
+/* Advanced Fields */
+.advanced-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  overflow: hidden;
+  transition: all var(--transition-base);
+  opacity: 0;
+  max-height: 0;
+}
+
+.advanced-fields.show {
+  opacity: 1;
+  max-height: 1000px;
+  margin-top: 0.5rem;
+}
+
+/* Focus Area */
+.focus-area {
+  border: 2px dashed var(--glass-border);
+  border-radius: 1rem;
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(10px);
+  transition: all var(--transition-base);
+}
+
+.focus-area:hover {
+  border-color: var(--accent-orange);
+  background: rgba(249, 115, 22, 0.05);
+}
+
+.focus-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  text-align: center;
+}
+
+.focus-label {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  margin: 0;
+}
+
+.focus-task-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  background: var(--gradient-warning);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0;
+}
+
+.focus-task-details {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  margin: 0.5rem 0 0;
+}
+
+.focus-actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
 }

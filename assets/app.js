@@ -144,6 +144,15 @@ function assignDomRefs() {
   dom.importInput = document.getElementById('import-data');
   dom.completeDaily = document.getElementById('complete-daily');
   dom.completeWeekly = document.getElementById('complete-weekly');
+
+  // New Engage panel elements
+  dom.toggleAdvanced = document.getElementById('toggle-advanced');
+  dom.advancedFields = document.getElementById('advanced-fields');
+  dom.toggleIcon = document.getElementById('toggle-icon');
+  dom.currentFocus = document.getElementById('current-focus');
+  dom.pickFocus = document.getElementById('pick-focus');
+  dom.nextActions = document.getElementById('next-actions');
+  dom.completedToday = document.getElementById('completed-today');
 }
 
 async function loadParaMetadata() {
@@ -250,6 +259,16 @@ function bindEvents() {
     store.markReview('weekly');
     renderReview();
   });
+
+  // Toggle advanced fields
+  dom.toggleAdvanced.addEventListener('click', () => {
+    const isExpanded = dom.advancedFields.classList.toggle('show');
+    dom.toggleIcon.classList.toggle('expanded', isExpanded);
+    dom.advancedFields.style.display = isExpanded ? 'flex' : 'none';
+  });
+
+  // Pick focus functionality
+  dom.pickFocus.addEventListener('click', pickFocusTask);
 }
 
 function handleCaptureSubmit(event) {
@@ -307,6 +326,7 @@ function renderAll() {
   renderParaTree();
   renderOrganizedList();
   renderReview();
+  renderEngage();
 }
 
 function renderInbox() {
@@ -628,6 +648,112 @@ function formatStatus(status) {
 function scrollToSection(element) {
   element.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
+
+// Engage Panel Functions
+function renderEngage() {
+  // Get today's tasks (active tasks with due date today or overdue)
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const todayTasks = store.objects.filter(obj => {
+    if (obj.status === 'done' || obj.status === 'archived') return false;
+    if (!obj.dueAt) return false;
+    const dueDate = new Date(obj.dueAt);
+    dueDate.setHours(0, 0, 0, 0);
+    return dueDate <= today;
+  }).sort((a, b) => (b.priorityScore || 0) - (a.priorityScore || 0));
+
+  // Render "Up Next" - top 5 priority tasks
+  dom.nextActions.innerHTML = '';
+  todayTasks.slice(0, 5).forEach(task => {
+    const card = buildCard(task, {
+      actions: [
+        actionButton('Start', () => setCurrentFocus(task.id)),
+        actionButton('Done', () => markComplete(task.id))
+      ]
+    });
+    dom.nextActions.appendChild(card);
+  });
+
+  if (todayTasks.length === 0) {
+    dom.nextActions.innerHTML = '<p style="color: var(--text-muted); text-align: center; padding: 2rem;">No tasks due today. Great job!</p>';
+  }
+
+  // Render "Completed Today"
+  const completedToday = store.objects.filter(obj => {
+    if (obj.status !== 'done') return false;
+    const completedDate = new Date(obj.completedAt || obj.capturedAt);
+    completedDate.setHours(0, 0, 0, 0);
+    return completedDate.getTime() === today.getTime();
+  });
+
+  dom.completedToday.innerHTML = '';
+  completedToday.forEach(task => {
+    const card = buildCard(task, { hideActions: true });
+    dom.completedToday.appendChild(card);
+  });
+
+  if (completedToday.length === 0) {
+    dom.completedToday.innerHTML = '<p style="color: var(--text-muted); text-align: center; padding: 2rem;">No tasks completed yet today.</p>';
+  }
+}
+
+function pickFocusTask() {
+  // Get the highest priority task from "Up Next"
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const todayTasks = store.objects.filter(obj => {
+    if (obj.status === 'done' || obj.status === 'archived') return false;
+    if (!obj.dueAt) return false;
+    const dueDate = new Date(obj.dueAt);
+    dueDate.setHours(0, 0, 0, 0);
+    return dueDate <= today;
+  }).sort((a, b) => (b.priorityScore || 0) - (a.priorityScore || 0));
+
+  if (todayTasks.length > 0) {
+    setCurrentFocus(todayTasks[0].id);
+  } else {
+    alert('No tasks available to focus on. Add some tasks with due dates!');
+  }
+}
+
+function setCurrentFocus(taskId) {
+  const task = store.objects.find(obj => obj.id === taskId);
+  if (!task) return;
+
+  // Update the focus area
+  dom.currentFocus.innerHTML = `
+    <h3 class="focus-task-title">${task.title}</h3>
+    <p class="focus-task-details">${task.body || 'No details'}</p>
+    <div class="focus-actions">
+      <button class="primary" onclick="completeCurrentFocus('${taskId}')">✓ Complete</button>
+      <button onclick="clearCurrentFocus()">Cancel</button>
+    </div>
+  `;
+
+  // Store current focus in state
+  state.currentFocusId = taskId;
+}
+
+function completeCurrentFocus(taskId) {
+  markComplete(taskId);
+  clearCurrentFocus();
+}
+
+function clearCurrentFocus() {
+  state.currentFocusId = null;
+  dom.currentFocus.innerHTML = `
+    <p class="focus-label">No active focus</p>
+    <button id="pick-focus" class="primary">Pick a Task</button>
+  `;
+  // Re-bind the pick focus button
+  document.getElementById('pick-focus').addEventListener('click', pickFocusTask);
+}
+
+// Make functions globally available for inline onclick handlers
+window.completeCurrentFocus = completeCurrentFocus;
+window.clearCurrentFocus = clearCurrentFocus;
 
 // Placeholder hooks for Google Drive / Apps Script sync.
 export async function pushToDrive(object) {

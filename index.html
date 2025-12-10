@@ -30,12 +30,13 @@
     <section class="panel" id="capture-panel">
       <div class="panel-header">
         <h2>Capture</h2>
-        <p>Universal Inbox + quick capture</p>
+        <p>Quick capture anything</p>
       </div>
       <form id="capture-form">
+        <!-- Essential Fields -->
         <div class="field">
           <label for="entry-title">Title</label>
-          <input id="entry-title" name="title" placeholder="Short descriptive title" required />
+          <input id="entry-title" name="title" placeholder="What needs capturing?" required />
         </div>
         <div class="field">
           <label for="entry-type">Type</label>
@@ -48,59 +49,69 @@
         </div>
         <div class="field">
           <label for="entry-body">Details</label>
-          <textarea id="entry-body" name="body" rows="4" placeholder="Drop thoughts, meeting notes, links…"></textarea>
+          <textarea id="entry-body" name="body" rows="3" placeholder="Quick notes..."></textarea>
         </div>
-        <div class="field split">
-          <div>
-            <label for="entry-due">Due</label>
-            <input type="date" id="entry-due" name="due" />
+
+        <!-- Advanced Fields (Collapsible) -->
+        <button type="button" id="toggle-advanced" class="toggle-btn">
+          <span id="toggle-icon">▶</span> Advanced Options
+        </button>
+        <div id="advanced-fields" class="advanced-fields" style="display: none;">
+          <div class="field split">
+            <div>
+              <label for="entry-due">Due</label>
+              <input type="date" id="entry-due" name="due" />
+            </div>
+            <div>
+              <label for="entry-effort">Est. mins</label>
+              <input type="number" id="entry-effort" name="effort" min="1" />
+            </div>
+            <div>
+              <label for="entry-energy">Energy</label>
+              <select id="entry-energy" name="energy">
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+                <option value="low">Low</option>
+              </select>
+            </div>
           </div>
-          <div>
-            <label for="entry-effort">Est. mins</label>
-            <input type="number" id="entry-effort" name="effort" min="1" />
+          <div class="field split">
+            <div>
+              <label for="entry-area">Area</label>
+              <select id="entry-area" name="area"></select>
+            </div>
+            <div>
+              <label for="entry-project">Project</label>
+              <select id="entry-project" name="project"></select>
+            </div>
           </div>
-          <div>
-            <label for="entry-energy">Energy</label>
-            <select id="entry-energy" name="energy">
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
-              <option value="low">Low</option>
-            </select>
+          <div class="field">
+            <label for="entry-tags">Tags (comma separated)</label>
+            <input id="entry-tags" name="tags" placeholder="meeting, follow-up" />
+          </div>
+          <div class="field">
+            <label for="entry-next-action">Next Action</label>
+            <input id="entry-next-action" name="nextAction" placeholder="Verb + object" />
           </div>
         </div>
-        <div class="field split">
-          <div>
-            <label for="entry-area">Area</label>
-            <select id="entry-area" name="area"></select>
-          </div>
-          <div>
-            <label for="entry-project">Project</label>
-            <select id="entry-project" name="project"></select>
-          </div>
-        </div>
-        <div class="field">
-          <label for="entry-tags">Tags (comma separated)</label>
-          <input id="entry-tags" name="tags" placeholder="meeting, follow-up" />
-        </div>
-        <div class="field">
-          <label for="entry-next-action">Next Action</label>
-          <input id="entry-next-action" name="nextAction" placeholder="Verb + object" />
-        </div>
+
         <button type="submit" class="primary">Capture</button>
       </form>
-
-      <div class="panel-subsection">
-        <h3>Inbox</h3>
-        <div id="inbox-list" class="card-list"></div>
-      </div>
     </section>
 
     <section class="panel" id="organize-panel">
       <div class="panel-header">
         <h2>Organize</h2>
-        <p>PARA tree + assignment</p>
+        <p>Process & categorize</p>
       </div>
+
+      <div class="panel-subsection">
+        <h3>Inbox</h3>
+        <div id="inbox-list" class="card-list"></div>
+      </div>
+
       <div class="panel-subsection para-tree" id="para-tree"></div>
+
       <div class="panel-subsection">
         <h3>Context Filters</h3>
         <div class="filters">
@@ -117,7 +128,7 @@
     <section class="panel" id="review-panel">
       <div class="panel-header">
         <h2>Review</h2>
-        <p>Daily + Weekly rituals</p>
+        <p>Reflect & plan</p>
       </div>
       <div class="panel-subsection">
         <div class="ritual-header">
@@ -132,6 +143,33 @@
           <button id="complete-weekly">Mark Done</button>
         </div>
         <div id="weekly-review" class="card-list"></div>
+      </div>
+    </section>
+
+    <section class="panel" id="engage-panel">
+      <div class="panel-header">
+        <h2>Engage</h2>
+        <p>Execute & do</p>
+      </div>
+
+      <div class="panel-subsection">
+        <h3>Today's Focus</h3>
+        <div id="today-focus" class="focus-area">
+          <div class="focus-item" id="current-focus">
+            <p class="focus-label">No active focus</p>
+            <button id="pick-focus" class="primary">Pick a Task</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-subsection">
+        <h3>Up Next</h3>
+        <div id="next-actions" class="card-list"></div>
+      </div>
+
+      <div class="panel-subsection">
+        <h3>Completed Today</h3>
+        <div id="completed-today" class="card-list"></div>
       </div>
     </section>
   </main>
