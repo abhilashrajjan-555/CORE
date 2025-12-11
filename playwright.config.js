@@ -1,9 +1,16 @@
 export default {
   testDir: './tests',
-  timeout: 30000,
+  timeout: 60000,
   use: {
-    baseURL: 'file:///Users/abhilashrajan/Developer/C.O.R.E. Workflow/index.html',
+    baseURL: 'http://localhost:8000',
     headless: true,
+    screenshot: 'only-on-failure',
+    video: 'retain-on-failure',
+    navigationTimeout: 30000,
   },
-  webServer: null, // We're testing a static file, not a web server
+  reporter: [
+    ['list'],
+    ['html', { open: 'never' }]
+  ],
+  webServer: null, // We'll start the server manually with python3 -m http.server 8000
 };

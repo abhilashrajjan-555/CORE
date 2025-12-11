@@ -1,0 +1,141 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - heading "C.O.R.E. Workflow" [level=1] [ref=e4]
+      - paragraph [ref=e5]: Capture · Organize · Review · Engage
+    - navigation [ref=e6]:
+      - button "Engage - Execute tasks" [ref=e7] [cursor=pointer]: 🎯 Engage
+      - button "Capture - Add new items" [ref=e8] [cursor=pointer]: 📥 Capture
+      - button "Organize - Process inbox" [ref=e9] [cursor=pointer]:
+        - text: 📂 Organize
+        - generic [ref=e10]: "2"
+      - button "Review - Daily and weekly rituals" [ref=e11] [cursor=pointer]: 📊 Review
+    - generic [ref=e12]:
+      - button "Export JSON" [ref=e13] [cursor=pointer]
+      - generic "Import data from JSON" [ref=e14] [cursor=pointer]:
+        - text: Import JSON
+        - button "Import JSON" [ref=e15]
+  - main [ref=e16]:
+    - generic [ref=e17]:
+      - generic [ref=e18]:
+        - heading "Organize" [level=2] [ref=e19]
+        - paragraph [ref=e20]: Process & categorize
+      - generic [ref=e21]:
+        - heading "Inbox" [level=3] [ref=e22]
+        - generic [ref=e23]:
+          - article [ref=e24]:
+            - generic [ref=e25]:
+              - generic [ref=e26]: task
+              - generic [ref=e27]: Inbox
+            - heading "Task for Modal Test" [level=4] [ref=e28]
+            - paragraph [ref=e29]: No description yet.
+            - generic [ref=e30]:
+              - term [ref=e31]: Area
+              - definition [ref=e32]: Inbox
+              - term [ref=e33]: Project
+              - definition [ref=e34]: Unassigned
+              - term [ref=e35]: Due / Priority
+              - definition [ref=e36]: — / 35
+              - term [ref=e37]: Tags
+              - definition [ref=e38]: —
+            - generic [ref=e39]:
+              - button "Complete" [ref=e40] [cursor=pointer]
+              - button "Move to Next" [ref=e41] [cursor=pointer]
+              - button "Assign Project" [active] [ref=e42] [cursor=pointer]
+          - article [ref=e43]:
+            - generic [ref=e44]:
+              - generic [ref=e45]: idea
+              - generic [ref=e46]: Inbox
+            - heading "Notion AI templates" [level=4] [ref=e47]
+            - paragraph [ref=e48]: Auto-generate meeting briefs from captured notes.
+            - generic [ref=e49]:
+              - term [ref=e50]: Area
+              - definition [ref=e51]: Work and Career
+              - term [ref=e52]: Project
+              - definition [ref=e53]: Thought Leadership
+              - term [ref=e54]: Due / Priority
+              - definition [ref=e55]: — / 40
+              - term [ref=e56]: Tags
+              - definition [ref=e57]: ai, template
+            - generic [ref=e58]:
+              - button "Complete" [ref=e59] [cursor=pointer]
+              - button "Move to Next" [ref=e60] [cursor=pointer]
+              - button "Assign Project" [ref=e61] [cursor=pointer]
+      - generic [ref=e62]:
+        - generic [ref=e63]:
+          - generic [ref=e64] [cursor=pointer]:
+            - heading "Personal Optimization" [level=4] [ref=e65]
+            - generic [ref=e66]: weekly review
+          - button "Habit Tune-Up (0)" [ref=e68] [cursor=pointer]
+        - generic [ref=e69]:
+          - generic [ref=e70] [cursor=pointer]:
+            - heading "Work and Career" [level=4] [ref=e71]
+            - generic [ref=e72]: weekly review
+          - generic [ref=e73]:
+            - button "C.O.R.E. System Build (2)" [ref=e74] [cursor=pointer]
+            - button "Thought Leadership (1)" [ref=e75] [cursor=pointer]
+      - generic [ref=e76]:
+        - heading "Context Filters" [level=3] [ref=e77]
+        - generic [ref=e78]:
+          - button "All" [ref=e79] [cursor=pointer]
+          - button "Tasks" [ref=e80] [cursor=pointer]
+          - button "Ideas" [ref=e81] [cursor=pointer]
+          - button "Notes" [ref=e82] [cursor=pointer]
+          - button "Media" [ref=e83] [cursor=pointer]
+        - textbox "Search items by title or tags" [ref=e85]:
+          - /placeholder: Search items...
+        - generic [ref=e86]:
+          - article [ref=e87]:
+            - generic [ref=e88]:
+              - generic [ref=e89]: task
+              - generic [ref=e90]: Next
+            - heading "Draft automation brief for Apps Script" [level=4] [ref=e91]
+            - paragraph [ref=e92]: Outline triggers for capture, organize, and review flows.
+            - generic [ref=e93]:
+              - term [ref=e94]: Area
+              - definition [ref=e95]: Work and Career
+              - term [ref=e96]: Project
+              - definition [ref=e97]: C.O.R.E. System Build
+              - term [ref=e98]: Due / Priority
+              - definition [ref=e99]: Dec 12 / 82
+              - term [ref=e100]: Tags
+              - definition [ref=e101]: automation, design
+            - generic [ref=e102]:
+              - button "Complete" [ref=e103] [cursor=pointer]
+              - button "Snooze" [ref=e104] [cursor=pointer]
+          - article [ref=e105]:
+            - generic [ref=e106]:
+              - generic [ref=e107]: note
+              - generic [ref=e108]: Active
+            - heading "Weekly sync highlights" [level=4] [ref=e109]
+            - paragraph [ref=e110]: Focus on GitHub Pages MVP and Drive automation connector.
+            - generic [ref=e111]:
+              - term [ref=e112]: Area
+              - definition [ref=e113]: Work and Career
+              - term [ref=e114]: Project
+              - definition [ref=e115]: C.O.R.E. System Build
+              - term [ref=e116]: Due / Priority
+              - definition [ref=e117]: — / 55
+              - term [ref=e118]: Tags
+              - definition [ref=e119]: meeting
+            - generic [ref=e120]:
+              - button "Complete" [ref=e121] [cursor=pointer]
+              - button "Snooze" [ref=e122] [cursor=pointer]
+  - dialog "Assign Project" [ref=e125]:
+    - generic [ref=e126]:
+      - heading "Assign Project" [level=3] [ref=e127]
+      - button "Close dialog" [ref=e128] [cursor=pointer]: ×
+    - generic [ref=e130]:
+      - generic [ref=e131]: "Select Project:"
+      - combobox [ref=e132]:
+        - option "-- Choose a project --" [selected]
+        - option "Habit Tune-Up"
+        - option "C.O.R.E. System Build"
+        - option "Thought Leadership"
+    - generic [ref=e133]:
+      - button "Cancel" [ref=e134] [cursor=pointer]
+      - button "Confirm" [ref=e135] [cursor=pointer]
+```

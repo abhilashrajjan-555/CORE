@@ -1,0 +1,82 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - heading "C.O.R.E. Workflow" [level=1] [ref=e4]
+      - paragraph [ref=e5]: Capture · Organize · Review · Engage
+    - navigation [ref=e6]:
+      - button "Engage - Execute tasks" [ref=e7] [cursor=pointer]: 🎯 Engage
+      - button "Capture - Add new items" [ref=e8] [cursor=pointer]: 📥 Capture
+      - button "Organize - Process inbox" [ref=e9] [cursor=pointer]:
+        - text: 📂 Organize
+        - generic [ref=e10]: "1"
+      - button "Review - Daily and weekly rituals" [ref=e11] [cursor=pointer]: 📊 Review
+    - generic [ref=e12]:
+      - button "Export JSON" [ref=e13] [cursor=pointer]
+      - generic "Import data from JSON" [ref=e14] [cursor=pointer]:
+        - text: Import JSON
+        - button "Import JSON" [ref=e15]
+  - main [ref=e16]:
+    - generic [ref=e17]:
+      - generic [ref=e18]:
+        - heading "Capture" [level=2] [ref=e19]
+        - paragraph [ref=e20]: Quick capture anything
+      - generic [ref=e21]:
+        - generic [ref=e22]:
+          - generic [ref=e23]: Title
+          - textbox "Title" [ref=e24]:
+            - /placeholder: What needs capturing?
+        - generic [ref=e25]:
+          - generic [ref=e26]: Type
+          - combobox "Type" [ref=e27]:
+            - option "Task" [selected]
+            - option "Idea"
+            - option "Note"
+            - option "Media"
+        - generic [ref=e28]:
+          - generic [ref=e29]: Details
+          - textbox "Details" [ref=e30]:
+            - /placeholder: Quick notes...
+        - button "▶ Advanced Options" [active] [ref=e31] [cursor=pointer]:
+          - generic [ref=e32]: ▶
+          - text: Advanced Options
+        - generic [ref=e33]:
+          - generic [ref=e34]:
+            - generic [ref=e35]:
+              - generic [ref=e36]: Due
+              - textbox "Due" [ref=e37]
+            - generic [ref=e38]:
+              - generic [ref=e39]: Est. mins
+              - spinbutton "Est. mins" [ref=e40]
+            - generic [ref=e41]:
+              - generic [ref=e42]: Energy
+              - combobox "Energy" [ref=e43]:
+                - option "Medium" [selected]
+                - option "High"
+                - option "Low"
+          - generic [ref=e44]:
+            - generic [ref=e45]:
+              - generic [ref=e46]: Area
+              - combobox "Area" [ref=e47]:
+                - option "Unassigned" [selected]
+                - option "Personal Optimization"
+                - option "Work and Career"
+            - generic [ref=e48]:
+              - generic [ref=e49]: Project
+              - combobox "Project" [ref=e50]:
+                - option "Unassigned" [selected]
+                - option "Habit Tune-Up"
+                - option "C.O.R.E. System Build"
+                - option "Thought Leadership"
+          - generic [ref=e51]:
+            - generic [ref=e52]: Tags (comma separated)
+            - textbox "Tags (comma separated)" [ref=e53]:
+              - /placeholder: meeting, follow-up
+          - generic [ref=e54]:
+            - generic [ref=e55]: Next Action
+            - textbox "Next Action" [ref=e56]:
+              - /placeholder: Verb + object
+        - button "Capture" [ref=e57] [cursor=pointer]
+```

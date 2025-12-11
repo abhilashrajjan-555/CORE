@@ -112,19 +112,20 @@ body::before {
 
 .app-header h1 {
   font-family: 'Inter', sans-serif;
-  font-size: 1.25rem;
+  font-size: 1.35rem;
   font-weight: 700;
   color: var(--accent-primary);
   letter-spacing: -0.02em;
   margin: 0;
+  line-height: 1.2;
 }
 
 .app-header p {
-  margin: 0.5rem 0 0;
+  margin: 0.25rem 0 0;
   color: var(--text-secondary);
-  font-size: 0.95rem;
-  font-weight: 500;
-  letter-spacing: 0.05em;
+  font-size: 0.875rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
 }
 
 .header-actions {
@@ -146,11 +147,12 @@ button {
   border: 1px solid var(--glass-border);
   background: var(--bg-secondary);
   color: var(--text-primary);
-  padding: 0.65rem 1.25rem;
+  padding: 0.625rem 1.25rem;
   border-radius: 0.5rem;
   cursor: pointer;
   transition: all var(--transition-base);
   font-weight: 500;
+  font-size: 0.9rem;
   position: relative;
   overflow: hidden;
 }
@@ -201,18 +203,17 @@ button.primary:hover {
 .import-label {
   border: 2px dashed var(--glass-border);
   padding: 0.6rem 1.2rem;
-  border-radius: 0.75rem;
+  border-radius: 0.5rem;
   cursor: pointer;
   position: relative;
   overflow: hidden;
   transition: all var(--transition-base);
-  background: var(--glass-bg);
-  backdrop-filter: blur(10px);
+  background: var(--bg-secondary);
 }
 
 .import-label:hover {
-  border-color: var(--accent-cyan);
-  background: rgba(6, 182, 212, 0.1);
+  border-color: var(--accent-primary);
+  background: var(--bg-secondary);
 }
 
 .import-label input {
@@ -232,17 +233,20 @@ button.primary:hover {
 }
 
 .tab-btn {
-  padding: 0.6rem 1.2rem;
+  padding: 0.625rem 1.25rem;
   background: transparent;
   border: 1px solid transparent;
   color: var(--text-secondary);
-  border-radius: 0.4rem;
+  border-radius: 0.5rem;
   cursor: pointer;
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 1.1rem;
   transition: all var(--transition-base);
   position: relative;
   white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .tab-btn:hover {
@@ -361,10 +365,12 @@ button.primary:hover {
 
 .panel-header h2 {
   font-family: 'Inter', sans-serif;
-  font-size: 1.5rem;
+  font-size: 1.75rem;
   font-weight: 700;
   margin: 0;
   color: var(--accent-primary);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
 }
 
 #organize-panel .panel-header h2 {
@@ -431,6 +437,20 @@ form {
   color: var(--text-dim);
 }
 
+/* Date Input Styling */
+.field input[type="date"] {
+  min-height: 2.5rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.field input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  filter: invert(0.4);
+  margin-right: 0.25rem;
+}
+
 .field.split {
   flex-direction: row;
   gap: 1rem;
@@ -451,11 +471,12 @@ form {
 }
 
 .panel-subsection h3 {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 1.25rem;
+  font-family: 'Inter', sans-serif;
+  font-size: 1.125rem;
   font-weight: 600;
   margin: 0;
   color: var(--text-primary);
+  letter-spacing: -0.01em;
 }
 
 /* Card List */
@@ -606,10 +627,9 @@ form {
 /* PARA Tree */
 .para-tree {
   border: 1px solid var(--glass-border);
-  border-radius: 1rem;
+  border-radius: 0.6rem;
   padding: 1.5rem;
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(10px);
+  background: var(--bg-secondary);
 }
 
 .area-block {
@@ -639,10 +659,11 @@ form {
 
 .area-header h4 {
   margin: 0;
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 1.1rem;
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
   font-weight: 600;
   color: var(--text-primary);
+  letter-spacing: -0.01em;
 }
 
 .area-header small {
@@ -664,12 +685,12 @@ form {
   justify-content: flex-start;
   font-size: 0.9rem;
   padding: 0.6rem 1rem;
-  background: rgba(255, 255, 255, 0.02);
+  background: transparent;
 }
 
 .project-list button:hover {
-  background: rgba(139, 92, 246, 0.1);
-  border-color: var(--accent-purple);
+  background: var(--bg-tertiary);
+  border-color: var(--accent-light);
 }
 
 /* Filters */
@@ -685,10 +706,10 @@ form {
 }
 
 .filters button.active {
-  background: var(--gradient-primary);
+  background: var(--accent-primary);
   border: none;
   color: white;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  box-shadow: var(--shadow-sm);
 }
 
 /* Ritual Header */
@@ -745,11 +766,39 @@ form {
   }
 }
 
+@media (max-width: 768px) {
+  .tab-navigation {
+    gap: 0.75rem;
+  }
+
+  .tab-btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+  }
+
+  .panel {
+    padding: 1.75rem;
+  }
+}
+
 @media (max-width: 900px) {
   .app-header {
     flex-direction: column;
     align-items: flex-start;
     padding: 1.5rem 2rem;
+    gap: 1.5rem;
+  }
+
+  .tab-navigation {
+    width: 100%;
+    justify-content: flex-start;
+    overflow-x: auto;
+    gap: 0.75rem;
+  }
+
+  .header-actions {
+    width: 100%;
+    justify-content: flex-start;
   }
 
   .panels {
@@ -758,13 +807,38 @@ form {
   }
 
   .app-header h1 {
-    font-size: 1.75rem;
+    font-size: 1.5rem;
   }
 }
 
 @media (max-width: 600px) {
   .app-header {
     padding: 1rem 1.5rem;
+    gap: 1rem;
+  }
+
+  .app-header h1 {
+    font-size: 1.25rem;
+  }
+
+  .app-header p {
+    font-size: 0.8rem;
+  }
+
+  .tab-btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+  }
+
+  .header-actions {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .header-actions button,
+  .import-label {
+    font-size: 0.85rem;
+    padding: 0.5rem 1rem;
   }
 
   .panels {
@@ -776,8 +850,24 @@ form {
     padding: 1.5rem;
   }
 
+  .panel-header h2 {
+    font-size: 1.5rem;
+  }
+
   .field.split {
     flex-direction: column;
+  }
+
+  .object-card {
+    padding: 1rem;
+  }
+
+  .card-actions {
+    flex-direction: column;
+  }
+
+  .card-actions button {
+    width: 100%;
   }
 }
 
@@ -800,10 +890,10 @@ form {
 
 /* Toggle Button for Advanced Fields */
 .toggle-btn {
-  background: rgba(255, 255, 255, 0.05);
+  background: transparent;
   border: 1px solid var(--glass-border);
   padding: 0.75rem 1rem;
-  border-radius: 0.75rem;
+  border-radius: 0.5rem;
   cursor: pointer;
   transition: all var(--transition-base);
   font-weight: 500;
@@ -816,8 +906,8 @@ form {
 }
 
 .toggle-btn:hover {
-  background: rgba(139, 92, 246, 0.1);
-  border-color: var(--accent-purple);
+  background: var(--bg-tertiary);
+  border-color: var(--accent-primary);
   color: var(--text-primary);
 }
 
@@ -851,16 +941,15 @@ form {
 /* Focus Area */
 .focus-area {
   border: 2px dashed var(--glass-border);
-  border-radius: 1rem;
+  border-radius: 0.6rem;
   padding: 2rem;
-  background: rgba(255, 255, 255, 0.02);
-  backdrop-filter: blur(10px);
+  background: var(--bg-secondary);
   transition: all var(--transition-base);
 }
 
 .focus-area:hover {
-  border-color: var(--accent-orange);
-  background: rgba(249, 115, 22, 0.05);
+  border-color: var(--accent-media);
+  background: var(--bg-secondary);
 }
 
 .focus-item {
@@ -881,10 +970,7 @@ form {
 .focus-task-title {
   font-size: 1.5rem;
   font-weight: 700;
-  background: var(--gradient-warning);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--accent-primary);
   margin: 0;
 }
 
@@ -925,7 +1011,7 @@ form {
 
 .modal-dialog {
   background: var(--bg-primary);
-  border-radius: 0.6rem;
+  border-radius: 0.5rem;
   box-shadow: var(--shadow-lg);
   max-width: 500px;
   width: 100%;
@@ -1043,7 +1129,7 @@ form {
 .modal-form-group input,
 .modal-form-group select {
   padding: 0.75rem;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--bg-secondary);
   border: 1px solid var(--glass-border);
   border-radius: 0.5rem;
   color: var(--text-primary);
@@ -1054,9 +1140,9 @@ form {
 .modal-form-group input:focus,
 .modal-form-group select:focus {
   outline: none;
-  background: rgba(255, 255, 255, 0.08);
-  border-color: var(--accent-purple);
-  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+  background: var(--bg-primary);
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 2px rgba(55, 53, 47, 0.08);
 }
 
 .modal-form-group input.error,
@@ -1071,7 +1157,7 @@ form {
   bottom: 1.5rem;
   right: 1.5rem;
   padding: 1rem 1.5rem;
-  border-radius: 0.75rem;
+  border-radius: 0.5rem;
   font-weight: 500;
   box-shadow: var(--shadow-lg);
   animation: slideIn var(--transition-base);
@@ -1135,7 +1221,7 @@ form {
 .modal-footer button:focus-visible,
 .modal-form-group input:focus-visible,
 .modal-form-group select:focus-visible {
-  outline: 2px solid var(--accent-purple);
+  outline: 2px solid var(--accent-primary);
   outline-offset: 2px;
 }
 
@@ -1152,9 +1238,9 @@ form {
 .search-input {
   width: 100%;
   padding: 0.75rem 1rem;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--bg-secondary);
   border: 1px solid var(--glass-border);
-  border-radius: 0.75rem;
+  border-radius: 0.5rem;
   color: var(--text-primary);
   font-family: inherit;
   font-size: 0.95rem;
@@ -1167,7 +1253,7 @@ form {
 
 .search-input:focus {
   outline: none;
-  background: rgba(255, 255, 255, 0.08);
-  border-color: var(--accent-purple);
-  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+  background: var(--bg-primary);
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 2px rgba(55, 53, 47, 0.08);
 }

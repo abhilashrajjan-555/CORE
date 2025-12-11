@@ -1,59 +1,7 @@
 const STORAGE_KEY = 'core.objects';
 const REVIEW_KEY = 'core.reviewLog';
 
-const DEFAULT_OBJECTS = [
-  {
-    id: 'seed-task-1',
-    type: 'task',
-    title: 'Draft automation brief for Apps Script',
-    body: 'Outline triggers for capture, organize, and review flows.',
-    areaId: 'work',
-    projectId: 'core-workflow',
-    status: 'next',
-    priorityScore: 82,
-    energyLevel: 'medium',
-    estimatedEffortMins: 45,
-    dueAt: new Date(Date.now() + 86400000).toISOString(),
-    capturedAt: new Date().toISOString(),
-    tags: ['automation', 'design'],
-    nextAction: 'Draft blueprint doc',
-    reviewCadence: 'daily'
-  },
-  {
-    id: 'seed-note-1',
-    type: 'note',
-    title: 'Weekly sync highlights',
-    body: 'Focus on GitHub Pages MVP and Drive automation connector.',
-    areaId: 'work',
-    projectId: 'core-workflow',
-    status: 'active',
-    priorityScore: 55,
-    energyLevel: 'low',
-    estimatedEffortMins: 15,
-    dueAt: null,
-    capturedAt: new Date().toISOString(),
-    tags: ['meeting'],
-    nextAction: 'Link to tasks',
-    reviewCadence: 'weekly'
-  },
-  {
-    id: 'seed-idea-1',
-    type: 'idea',
-    title: 'Notion AI templates',
-    body: 'Auto-generate meeting briefs from captured notes.',
-    areaId: 'work',
-    projectId: 'thought-leadership',
-    status: 'inbox',
-    priorityScore: 40,
-    energyLevel: 'low',
-    estimatedEffortMins: 20,
-    dueAt: null,
-    capturedAt: new Date().toISOString(),
-    tags: ['ai', 'template'],
-    nextAction: 'Brainstorm outline',
-    reviewCadence: 'weekly'
-  }
-];
+const DEFAULT_OBJECTS = [];
 
 class CoreStore {
   constructor() {
@@ -129,6 +77,11 @@ class CoreStore {
     this.save();
   }
 
+  delete(id) {
+    this.objects = this.objects.filter((obj) => obj.id !== id);
+    this.save();
+  }
+
   replaceAll(objects) {
     this.objects = objects;
     this.save();
@@ -180,11 +133,10 @@ function assignDomRefs() {
   dom.dailyReview = document.getElementById('daily-review');
   dom.weeklyReview = document.getElementById('weekly-review');
   dom.filterButtons = document.querySelectorAll('.filters button');
-  dom.exportButton = document.getElementById('export-data');
-  dom.importInput = document.getElementById('import-data');
   dom.completeDaily = document.getElementById('complete-daily');
   dom.completeWeekly = document.getElementById('complete-weekly');
   dom.searchInput = document.getElementById('search-input');
+  dom.clearAllButton = document.getElementById('clear-all-data');
 
   // Tab navigation elements
   dom.tabButtons = document.querySelectorAll('.tab-btn');
@@ -281,7 +233,7 @@ function populateAreaProjectSelects() {
 // Tab Navigation Management
 function initTabNavigation() {
   // Restore active tab from localStorage
-  const savedTab = window.localStorage.getItem('core.activeTab') || 'engage';
+  const savedTab = window.localStorage.getItem('core.activeTab') || 'capture';
   switchTab(savedTab);
 
   // Add click handlers to tab buttons
@@ -292,27 +244,6 @@ function initTabNavigation() {
     });
   });
 
-  // Keyboard shortcuts: 1-4 for tabs (e, c, o, r)
-  document.addEventListener('keydown', (e) => {
-    if (e.ctrlKey || e.metaKey) {
-      if (e.key === 'k' || e.key === 'K') {
-        // Ctrl+K for quick capture modal - will implement next
-        e.preventDefault();
-      }
-    } else {
-      // Number keys 1-4 for tab switching
-      const keyMap = { '1': 'engage', '2': 'capture', '3': 'organize', '4': 'review' };
-      if (keyMap[e.key]) {
-        e.preventDefault();
-        switchTab(keyMap[e.key]);
-      }
-      // Also support e, c, o, r keys
-      const keyLetterMap = { 'e': 'engage', 'c': 'capture', 'o': 'organize', 'r': 'review' };
-      if (keyLetterMap[e.key.toLowerCase()]) {
-        switchTab(keyLetterMap[e.key.toLowerCase()]);
-      }
-    }
-  });
 }
 
 function switchTab(tabName) {
@@ -392,8 +323,6 @@ function bindEvents() {
     });
   }
 
-  dom.exportButton.addEventListener('click', exportData);
-  dom.importInput.addEventListener('change', importData);
   dom.completeDaily.addEventListener('click', () => {
     store.markReview('daily');
     renderReview();
@@ -401,6 +330,18 @@ function bindEvents() {
   dom.completeWeekly.addEventListener('click', () => {
     store.markReview('weekly');
     renderReview();
+  });
+
+  // Clear all data
+  dom.clearAllButton.addEventListener('click', () => {
+    if (confirm('Are you sure? This will delete all data permanently.')) {
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(REVIEW_KEY);
+      store.objects = [];
+      store.reviewLog = { daily: null, weekly: null };
+      renderAll();
+      showNotification('All data cleared', 'success');
+    }
   });
 
   // Toggle advanced fields
@@ -707,6 +648,7 @@ function buildCard(object, options = {}) {
   actions.appendChild(actionButton('Complete', () => markComplete(object.id)));
   if (object.status === 'inbox') {
     actions.appendChild(actionButton('Move to Next', () => updateStatus(object.id, 'next')));
+    actions.appendChild(actionButton('Delete', () => deleteObject(object.id)));
   } else if (object.status !== 'done') {
     actions.appendChild(actionButton('Snooze', () => snoozeObject(object.id)));
   }
@@ -731,6 +673,11 @@ function markComplete(id) {
 
 function updateStatus(id, status) {
   store.update(id, { status });
+  renderAll();
+}
+
+function deleteObject(id) {
+  store.delete(id);
   renderAll();
 }
 
@@ -890,42 +837,6 @@ function showNotification(message, type = 'info') {
   notification.textContent = message;
   document.body.appendChild(notification);
   setTimeout(() => notification.remove(), 4000);
-}
-
-function exportData() {
-  const payload = {
-    generatedAt: new Date().toISOString(),
-    objects: store.objects,
-    reviewLog: store.reviewLog
-  };
-  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `core-database-${Date.now()}.json`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-}
-
-function importData(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    try {
-      const payload = JSON.parse(e.target.result);
-      if (!payload.objects) throw new Error('Invalid file');
-      store.replaceAll(payload.objects);
-      store.reviewLog = payload.reviewLog || store.reviewLog;
-      store.saveReviewLog();
-      renderAll();
-    } catch (error) {
-      alert(`Import failed: ${error.message}`);
-    }
-  };
-  reader.readAsText(file);
 }
 
 function lookupAreaName(id) {

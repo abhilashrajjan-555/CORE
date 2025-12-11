@@ -1,0 +1,16 @@
+{
+  "name": "core-workflow",
+  "version": "1.0.0",
+  "description": "C.O.R.E. Workflow System - Capture, Organize, Review, Engage",
+  "type": "module",
+  "scripts": {
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:debug": "playwright test --debug",
+    "test:report": "playwright show-report",
+    "start": "python3 -m http.server 8000"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.40.0"
+  }
+}

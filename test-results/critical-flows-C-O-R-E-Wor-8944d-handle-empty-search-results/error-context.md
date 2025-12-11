@@ -1,0 +1,108 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - heading "C.O.R.E. Workflow" [level=1] [ref=e4]
+      - paragraph [ref=e5]: Capture · Organize · Review · Engage
+    - navigation [ref=e6]:
+      - button "Engage - Execute tasks" [ref=e7] [cursor=pointer]: 🎯 Engage
+      - button "Capture - Add new items" [ref=e8] [cursor=pointer]: 📥 Capture
+      - button "Organize - Process inbox" [ref=e9] [cursor=pointer]:
+        - text: 📂 Organize
+        - generic [ref=e10]: "1"
+      - button "Review - Daily and weekly rituals" [ref=e11] [cursor=pointer]: 📊 Review
+    - generic [ref=e12]:
+      - button "Export JSON" [ref=e13] [cursor=pointer]
+      - generic "Import data from JSON" [ref=e14] [cursor=pointer]:
+        - text: Import JSON
+        - button "Import JSON" [ref=e15]
+  - main [ref=e16]:
+    - generic [ref=e17]:
+      - generic [ref=e18]:
+        - heading "Organize" [level=2] [ref=e19]
+        - paragraph [ref=e20]: Process & categorize
+      - generic [ref=e21]:
+        - heading "Inbox" [level=3] [ref=e22]
+        - article [ref=e24]:
+          - generic [ref=e25]:
+            - generic [ref=e26]: idea
+            - generic [ref=e27]: Inbox
+          - heading "Notion AI templates" [level=4] [ref=e28]
+          - paragraph [ref=e29]: Auto-generate meeting briefs from captured notes.
+          - generic [ref=e30]:
+            - term [ref=e31]: Area
+            - definition [ref=e32]: Work and Career
+            - term [ref=e33]: Project
+            - definition [ref=e34]: Thought Leadership
+            - term [ref=e35]: Due / Priority
+            - definition [ref=e36]: — / 40
+            - term [ref=e37]: Tags
+            - definition [ref=e38]: ai, template
+          - generic [ref=e39]:
+            - button "Complete" [ref=e40] [cursor=pointer]
+            - button "Move to Next" [ref=e41] [cursor=pointer]
+            - button "Assign Project" [ref=e42] [cursor=pointer]
+      - generic [ref=e43]:
+        - generic [ref=e44]:
+          - generic [ref=e45] [cursor=pointer]:
+            - heading "Personal Optimization" [level=4] [ref=e46]
+            - generic [ref=e47]: weekly review
+          - button "Habit Tune-Up (0)" [ref=e49] [cursor=pointer]
+        - generic [ref=e50]:
+          - generic [ref=e51] [cursor=pointer]:
+            - heading "Work and Career" [level=4] [ref=e52]
+            - generic [ref=e53]: weekly review
+          - generic [ref=e54]:
+            - button "C.O.R.E. System Build (2)" [ref=e55] [cursor=pointer]
+            - button "Thought Leadership (1)" [ref=e56] [cursor=pointer]
+      - generic [ref=e57]:
+        - heading "Context Filters" [level=3] [ref=e58]
+        - generic [ref=e59]:
+          - button "All" [ref=e60] [cursor=pointer]
+          - button "Tasks" [ref=e61] [cursor=pointer]
+          - button "Ideas" [ref=e62] [cursor=pointer]
+          - button "Notes" [ref=e63] [cursor=pointer]
+          - button "Media" [ref=e64] [cursor=pointer]
+        - textbox "Search items by title or tags" [active] [ref=e66]:
+          - /placeholder: Search items...
+          - text: NONEXISTENT_SEARCH_TERM_12345
+        - generic [ref=e67]:
+          - article [ref=e68]:
+            - generic [ref=e69]:
+              - generic [ref=e70]: task
+              - generic [ref=e71]: Next
+            - heading "Draft automation brief for Apps Script" [level=4] [ref=e72]
+            - paragraph [ref=e73]: Outline triggers for capture, organize, and review flows.
+            - generic [ref=e74]:
+              - term [ref=e75]: Area
+              - definition [ref=e76]: Work and Career
+              - term [ref=e77]: Project
+              - definition [ref=e78]: C.O.R.E. System Build
+              - term [ref=e79]: Due / Priority
+              - definition [ref=e80]: Dec 12 / 82
+              - term [ref=e81]: Tags
+              - definition [ref=e82]: automation, design
+            - generic [ref=e83]:
+              - button "Complete" [ref=e84] [cursor=pointer]
+              - button "Snooze" [ref=e85] [cursor=pointer]
+          - article [ref=e86]:
+            - generic [ref=e87]:
+              - generic [ref=e88]: note
+              - generic [ref=e89]: Active
+            - heading "Weekly sync highlights" [level=4] [ref=e90]
+            - paragraph [ref=e91]: Focus on GitHub Pages MVP and Drive automation connector.
+            - generic [ref=e92]:
+              - term [ref=e93]: Area
+              - definition [ref=e94]: Work and Career
+              - term [ref=e95]: Project
+              - definition [ref=e96]: C.O.R.E. System Build
+              - term [ref=e97]: Due / Priority
+              - definition [ref=e98]: — / 55
+              - term [ref=e99]: Tags
+              - definition [ref=e100]: meeting
+            - generic [ref=e101]:
+              - button "Complete" [ref=e102] [cursor=pointer]
+              - button "Snooze" [ref=e103] [cursor=pointer]
+```

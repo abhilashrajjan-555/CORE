@@ -1,0 +1,56 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - heading "C.O.R.E. Workflow" [level=1] [ref=e4]
+      - paragraph [ref=e5]: Capture · Organize · Review · Engage
+    - navigation [ref=e6]:
+      - button "Engage - Execute tasks" [ref=e7] [cursor=pointer]: 🎯 Engage
+      - button "Capture - Add new items" [ref=e8] [cursor=pointer]: 📥 Capture
+      - button "Organize - Process inbox" [ref=e9] [cursor=pointer]:
+        - text: 📂 Organize
+        - generic [ref=e10]: "1"
+      - button "Review - Daily and weekly rituals" [ref=e11] [cursor=pointer]: 📊 Review
+    - generic [ref=e12]:
+      - button "Export JSON" [ref=e13] [cursor=pointer]
+      - generic "Import data from JSON" [ref=e14] [cursor=pointer]:
+        - text: Import JSON
+        - button "Import JSON" [ref=e15]
+  - main [ref=e16]:
+    - generic [ref=e17]:
+      - generic [ref=e18]:
+        - heading "Review" [level=2] [ref=e19]
+        - paragraph [ref=e20]: Reflect & plan
+      - generic [ref=e21]:
+        - generic [ref=e22]:
+          - heading "Daily Focus" [level=3] [ref=e23]
+          - button "Mark Done" [ref=e24] [cursor=pointer]
+        - generic [ref=e25]:
+          - article [ref=e26]:
+            - heading "Top Focus" [level=4] [ref=e27]
+            - list [ref=e28]:
+              - listitem [ref=e29]: Draft automation brief for Apps Script (Next)
+          - article [ref=e30]:
+            - heading "Quick Wins" [level=4] [ref=e31]
+            - paragraph [ref=e32]: No items 🎉
+          - article [ref=e33]:
+            - heading "Overdue" [level=4] [ref=e34]
+            - paragraph [ref=e35]: No items 🎉
+      - generic [ref=e36]:
+        - generic [ref=e37]:
+          - heading "Weekly Radar" [level=3] [ref=e38]
+          - button "Done Today" [active] [ref=e39] [cursor=pointer]
+        - generic [ref=e40]:
+          - article [ref=e41]:
+            - heading "Inbox To Triage" [level=4] [ref=e42]
+            - list [ref=e43]:
+              - listitem [ref=e44]: Notion AI templates (idea)
+          - article [ref=e45]:
+            - heading "Project Progress" [level=4] [ref=e46]
+            - list [ref=e47]:
+              - listitem [ref=e48]: "Habit Tune-Up: 0%"
+              - listitem [ref=e49]: "C.O.R.E. System Build: 0%"
+              - listitem [ref=e50]: "Thought Leadership: 0%"
+```
