@@ -130,9 +130,16 @@ body::before {
   }
 }
 
+.header-title {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  white-space: nowrap;
+}
+
 .app-header h1 {
   font-family: 'Space Grotesk', sans-serif;
-  font-size: 2rem;
+  font-size: 1.5rem;
   font-weight: 700;
   background: var(--gradient-primary);
   -webkit-background-clip: text;
@@ -244,11 +251,69 @@ button.primary:hover {
   cursor: pointer;
 }
 
-/* Main Panels Grid */
+/* Tab Navigation */
+.tab-navigation {
+  display: flex;
+  gap: 1rem;
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+}
+
+.tab-btn {
+  padding: 0.75rem 1.5rem;
+  background: var(--glass-bg);
+  border: 1.5px solid var(--glass-border);
+  color: var(--text-secondary);
+  border-radius: 0.75rem;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all var(--transition-base);
+  position: relative;
+  backdrop-filter: blur(10px);
+  white-space: nowrap;
+}
+
+.tab-btn:hover {
+  border-color: var(--accent-purple);
+  color: var(--text-primary);
+  transform: translateY(-2px);
+}
+
+.tab-btn.active {
+  background: var(--gradient-primary);
+  border: 1.5px solid var(--accent-purple);
+  color: white;
+  box-shadow: 0 4px 16px rgba(139, 92, 246, 0.4);
+  transform: translateY(-2px);
+}
+
+.tab-btn.active:hover {
+  box-shadow: 0 8px 24px rgba(139, 92, 246, 0.6);
+  transform: translateY(-3px);
+}
+
+.tab-badge {
+  display: inline-block;
+  min-width: 1.5rem;
+  height: 1.5rem;
+  background: var(--gradient-secondary);
+  color: white;
+  border-radius: 50%;
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 0.5rem;
+  box-shadow: 0 2px 8px rgba(236, 72, 153, 0.4);
+}
+
+/* Main Panels Grid - Tab Based */
 .panels {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
-  gap: 2rem;
+  display: flex;
+  flex-direction: column;
   padding: 2rem 3rem 3rem;
   flex: 1;
   animation: fadeIn 0.8s ease-out;
@@ -273,13 +338,22 @@ button.primary:hover {
   padding: 2rem;
   border-radius: 1.5rem;
   border: 1px solid var(--glass-border);
-  display: flex;
+  display: none;
   flex-direction: column;
   gap: 1.5rem;
   box-shadow: var(--shadow-lg);
   transition: all var(--transition-base);
   position: relative;
   overflow: hidden;
+  flex: 1;
+  min-height: 500px;
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+}
+
+/* Show active panel */
+.panel[data-panel].active {
+  display: flex;
 }
 
 .panel::before {
@@ -878,4 +952,274 @@ form {
   gap: 1rem;
   flex-wrap: wrap;
   justify-content: center;
+}
+
+/* Modal Styles */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  animation: fadeIn var(--transition-fast);
+}
+
+.modal-overlay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  padding: 1rem;
+}
+
+.modal-dialog {
+  background: var(--bg-secondary);
+  border-radius: 1rem;
+  box-shadow: var(--shadow-xl);
+  max-width: 500px;
+  width: 100%;
+  border: 1px solid var(--glass-border);
+  overflow: hidden;
+  animation: slideUp var(--transition-base);
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--glass-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: var(--text-primary);
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+  transition: all var(--transition-fast);
+}
+
+.modal-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+}
+
+.modal-body {
+  padding: 1.5rem;
+}
+
+.modal-footer {
+  padding: 1.5rem;
+  border-top: 1px solid var(--glass-border);
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+.modal-footer button {
+  padding: 0.625rem 1.25rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--glass-border);
+  background: transparent;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-weight: 500;
+}
+
+.modal-footer button:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.modal-footer button.primary {
+  background: var(--gradient-primary);
+  border: none;
+  color: white;
+}
+
+.modal-footer button.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.modal-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.modal-form-group label {
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.modal-form-group input,
+.modal-form-group select {
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
+  border-radius: 0.5rem;
+  color: var(--text-primary);
+  font-family: inherit;
+  transition: all var(--transition-fast);
+}
+
+.modal-form-group input:focus,
+.modal-form-group select:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--accent-purple);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+}
+
+.modal-form-group input.error,
+.modal-form-group select.error {
+  border-color: #ef4444;
+}
+
+/* Notification Styles */
+.notification,
+.storage-error-notification {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  padding: 1rem 1.5rem;
+  border-radius: 0.75rem;
+  font-weight: 500;
+  box-shadow: var(--shadow-lg);
+  animation: slideIn var(--transition-base);
+  z-index: 999;
+  max-width: 400px;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.notification-success {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+}
+
+.notification-error {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+}
+
+.notification-info {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+}
+
+.storage-error-notification {
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+  color: white;
+}
+
+/* Accessibility: Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .modal,
+  .modal-dialog,
+  .notification,
+  .storage-error-notification,
+  .modal-form-group input:focus,
+  .modal-form-group select:focus,
+  button,
+  .pills,
+  .object-card {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  body::before {
+    animation: none !important;
+  }
+}
+
+/* Accessibility: Focus visible for keyboard navigation */
+.modal-close:focus-visible,
+.modal-footer button:focus-visible,
+.modal-form-group input:focus-visible,
+.modal-form-group select:focus-visible {
+  outline: 2px solid var(--accent-purple);
+  outline-offset: 2px;
+}
+
+/* Accessibility: Improved contrast for text */
+.modal-form-group label {
+  color: var(--text-primary);
+}
+
+/* Search Container */
+.search-container {
+  margin: 1rem 0;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
+  border-radius: 0.75rem;
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 0.95rem;
+  transition: all var(--transition-fast);
+}
+
+.search-input::placeholder {
+  color: var(--text-muted);
+}
+
+.search-input:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--accent-purple);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
 }

@@ -66,18 +66,57 @@ class CoreStore {
       this.objects = DEFAULT_OBJECTS;
       return;
     }
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    this.objects = raw ? JSON.parse(raw) : DEFAULT_OBJECTS;
-    const ritualRaw = window.localStorage.getItem(REVIEW_KEY);
-    this.reviewLog = ritualRaw ? JSON.parse(ritualRaw) : { daily: null, weekly: null };
+
+    try {
+      const raw = window.localStorage.getItem(STORAGE_KEY);
+      this.objects = raw ? JSON.parse(raw) : DEFAULT_OBJECTS;
+    } catch (error) {
+      console.error('Failed to load objects from localStorage:', error);
+      this.objects = DEFAULT_OBJECTS;
+      this.showStorageError('Failed to load data from storage. Using default data.');
+    }
+
+    try {
+      const ritualRaw = window.localStorage.getItem(REVIEW_KEY);
+      this.reviewLog = ritualRaw ? JSON.parse(ritualRaw) : { daily: null, weekly: null };
+    } catch (error) {
+      console.error('Failed to load review log from localStorage:', error);
+      this.reviewLog = { daily: null, weekly: null };
+    }
   }
 
   save() {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(this.objects));
+    try {
+      const serialized = JSON.stringify(this.objects);
+      window.localStorage.setItem(STORAGE_KEY, serialized);
+    } catch (error) {
+      console.error('Failed to save to localStorage:', error);
+      if (error.name === 'QuotaExceededError') {
+        this.showStorageError('Storage quota exceeded. Your data may not be saved. Try exporting your data and clearing old items.');
+      } else {
+        this.showStorageError('Failed to save data. Please check your browser storage settings.');
+      }
+    }
   }
 
   saveReviewLog() {
-    window.localStorage.setItem(REVIEW_KEY, JSON.stringify(this.reviewLog));
+    try {
+      const serialized = JSON.stringify(this.reviewLog);
+      window.localStorage.setItem(REVIEW_KEY, serialized);
+    } catch (error) {
+      console.error('Failed to save review log to localStorage:', error);
+      if (error.name === 'QuotaExceededError') {
+        this.showStorageError('Storage quota exceeded when saving review log.');
+      }
+    }
+  }
+
+  showStorageError(message) {
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'storage-error-notification';
+    errorDiv.textContent = message;
+    document.body.appendChild(errorDiv);
+    setTimeout(() => errorDiv.remove(), 5000);
   }
 
   add(object) {
@@ -116,7 +155,8 @@ class CoreStore {
 const store = new CoreStore();
 const state = {
   para: { areas: [] },
-  activeFilter: 'all'
+  activeFilter: 'all',
+  searchQuery: ''
 };
 
 const dom = {};
@@ -144,6 +184,11 @@ function assignDomRefs() {
   dom.importInput = document.getElementById('import-data');
   dom.completeDaily = document.getElementById('complete-daily');
   dom.completeWeekly = document.getElementById('complete-weekly');
+  dom.searchInput = document.getElementById('search-input');
+
+  // Tab navigation elements
+  dom.tabButtons = document.querySelectorAll('.tab-btn');
+  dom.panels = document.querySelectorAll('[data-panel]');
 
   // New Engage panel elements
   dom.toggleAdvanced = document.getElementById('toggle-advanced');
@@ -233,11 +278,97 @@ function populateAreaProjectSelects() {
   dom.projectSelect.innerHTML = projectOptions.join('');
 }
 
+// Tab Navigation Management
+function initTabNavigation() {
+  // Restore active tab from localStorage
+  const savedTab = window.localStorage.getItem('core.activeTab') || 'engage';
+  switchTab(savedTab);
+
+  // Add click handlers to tab buttons
+  dom.tabButtons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const tabName = btn.dataset.tab;
+      switchTab(tabName);
+    });
+  });
+
+  // Keyboard shortcuts: 1-4 for tabs (e, c, o, r)
+  document.addEventListener('keydown', (e) => {
+    if (e.ctrlKey || e.metaKey) {
+      if (e.key === 'k' || e.key === 'K') {
+        // Ctrl+K for quick capture modal - will implement next
+        e.preventDefault();
+      }
+    } else {
+      // Number keys 1-4 for tab switching
+      const keyMap = { '1': 'engage', '2': 'capture', '3': 'organize', '4': 'review' };
+      if (keyMap[e.key]) {
+        e.preventDefault();
+        switchTab(keyMap[e.key]);
+      }
+      // Also support e, c, o, r keys
+      const keyLetterMap = { 'e': 'engage', 'c': 'capture', 'o': 'organize', 'r': 'review' };
+      if (keyLetterMap[e.key.toLowerCase()]) {
+        switchTab(keyLetterMap[e.key.toLowerCase()]);
+      }
+    }
+  });
+}
+
+function switchTab(tabName) {
+  // Validate tab name
+  const validTabs = ['engage', 'capture', 'organize', 'review'];
+  if (!validTabs.includes(tabName)) {
+    console.warn(`Invalid tab name: ${tabName}`);
+    return;
+  }
+
+  // Hide all panels
+  dom.panels.forEach((panel) => {
+    panel.classList.remove('active');
+  });
+
+  // Show selected panel
+  const activePanel = document.querySelector(`[data-panel="${tabName}"]`);
+  if (activePanel) {
+    activePanel.classList.add('active');
+  }
+
+  // Update tab button states
+  dom.tabButtons.forEach((btn) => {
+    btn.classList.toggle('active', btn.dataset.tab === tabName);
+  });
+
+  // Save to localStorage
+  window.localStorage.setItem('core.activeTab', tabName);
+
+  // Update organize badge on tab switch
+  if (tabName === 'organize') {
+    updateOrganizeBadge();
+  }
+}
+
+function updateOrganizeBadge() {
+  const badge = document.getElementById('organize-badge');
+  if (!badge) return;
+
+  const inboxCount = store.objects.filter((obj) => obj.status === 'inbox').length;
+  if (inboxCount > 0) {
+    badge.textContent = inboxCount;
+    badge.style.display = 'flex';
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
 function bindEvents() {
   if (!dom.captureForm) {
     console.error('dom.captureForm is undefined!');
     return;
   }
+
+  // Tab navigation
+  initTabNavigation();
 
   dom.captureForm.addEventListener('submit', handleCaptureSubmit);
 
@@ -246,9 +377,21 @@ function bindEvents() {
       dom.filterButtons.forEach((b) => b.classList.remove('active'));
       btn.classList.add('active');
       state.activeFilter = btn.dataset.filter;
+      dom.searchInput.value = '';
       renderOrganizedList();
     });
   });
+
+  // Search functionality with debounce
+  if (dom.searchInput) {
+    let searchTimeout;
+    dom.searchInput.addEventListener('input', (e) => {
+      clearTimeout(searchTimeout);
+      state.searchQuery = e.target.value.toLowerCase();
+      searchTimeout = setTimeout(() => renderOrganizedList(), 150);
+    });
+  }
+
   dom.exportButton.addEventListener('click', exportData);
   dom.importInput.addEventListener('change', importData);
   dom.completeDaily.addEventListener('click', () => {
@@ -274,10 +417,42 @@ function bindEvents() {
 function handleCaptureSubmit(event) {
   event.preventDefault();
   const formData = new FormData(dom.captureForm);
+
+  // Validate required fields
+  const title = formData.get('title');
+  if (!title || !title.trim()) {
+    showNotification('Title is required', 'error');
+    return;
+  }
+
+  // Validate effort if provided
+  const effort = formData.get('effort');
+  if (effort) {
+    const effortNum = Number(effort);
+    if (isNaN(effortNum) || effortNum < 1 || effortNum > 480) {
+      showNotification('Estimated effort must be between 1 and 480 minutes', 'error');
+      return;
+    }
+  }
+
+  // Validate due date is not in the past
+  const due = formData.get('due');
+  if (due) {
+    const dueDate = new Date(due);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    dueDate.setHours(0, 0, 0, 0);
+    if (dueDate < today) {
+      showNotification('Due date cannot be in the past', 'error');
+      return;
+    }
+  }
+
   const newObject = createInformationObjectFromForm(formData);
   store.add(newObject);
   dom.captureForm.reset();
   renderAll();
+  showNotification('Item captured successfully', 'success');
 }
 
 function createInformationObjectFromForm(formData) {
@@ -327,6 +502,7 @@ function renderAll() {
   renderOrganizedList();
   renderReview();
   renderEngage();
+  updateOrganizeBadge();
 }
 
 function renderInbox() {
@@ -376,11 +552,22 @@ function renderParaTree() {
 
 function renderOrganizedList(projectFilter = null) {
   dom.organizedList.innerHTML = '';
-  const list = store
+  let list = store
     .getActive(state.activeFilter)
     .filter((obj) => (projectFilter ? obj.projectId === projectFilter : true));
+
+  // Apply search filter
+  if (state.searchQuery) {
+    list = list.filter((obj) => {
+      const titleMatch = obj.title.toLowerCase().includes(state.searchQuery);
+      const bodyMatch = obj.body.toLowerCase().includes(state.searchQuery);
+      const tagsMatch = obj.tags?.some((tag) => tag.toLowerCase().includes(state.searchQuery));
+      return titleMatch || bodyMatch || tagsMatch;
+    });
+  }
+
   if (!list.length) {
-    dom.organizedList.textContent = 'Nothing here yet.';
+    dom.organizedList.textContent = state.searchQuery ? 'No items match your search.' : 'Nothing here yet.';
     return;
   }
   const fragment = document.createDocumentFragment();
@@ -548,22 +735,161 @@ function updateStatus(id, status) {
 }
 
 function snoozeObject(id) {
-  const snoozeUntil = prompt('Snooze until (YYYY-MM-DD)?');
-  if (!snoozeUntil) return;
-  store.update(id, { snoozeUntil, status: 'waiting' });
-  renderAll();
+  showSnoozeModal(id);
 }
 
 function promptAssign(id) {
-  const projectId = prompt('Enter project ID (see Organize column):');
-  if (!projectId) return;
-  const project = findProject(projectId);
-  if (!project) {
-    alert('Project not found.');
-    return;
-  }
-  store.update(id, { projectId, areaId: findAreaByProject(projectId)?.id, status: 'active' });
-  renderAll();
+  showAssignModal(id);
+}
+
+function showSnoozeModal(id) {
+  const modal = createModal('Snooze Task', (resolve) => {
+    const formGroup = document.createElement('div');
+    formGroup.className = 'modal-form-group';
+
+    const label = document.createElement('label');
+    label.textContent = 'Snooze until:';
+
+    const input = document.createElement('input');
+    input.type = 'date';
+    input.min = new Date().toISOString().split('T')[0];
+
+    formGroup.append(label, input);
+
+    const handleConfirm = () => {
+      const snoozeUntil = input.value;
+      if (!snoozeUntil) {
+        input.classList.add('error');
+        return;
+      }
+      store.update(id, { snoozeUntil, status: 'waiting' });
+      renderAll();
+      resolve();
+    };
+
+    return { content: formGroup, onConfirm: handleConfirm };
+  });
+
+  document.body.appendChild(modal);
+  document.querySelector('.modal-overlay').focus();
+}
+
+function showAssignModal(id) {
+  const modal = createModal('Assign Project', (resolve) => {
+    const formGroup = document.createElement('div');
+    formGroup.className = 'modal-form-group';
+
+    const label = document.createElement('label');
+    label.textContent = 'Select Project:';
+
+    const select = document.createElement('select');
+    select.innerHTML = '<option value="">-- Choose a project --</option>';
+
+    state.para.areas.forEach((area) => {
+      const optgroup = document.createElement('optgroup');
+      optgroup.label = area.name;
+      area.projects.forEach((project) => {
+        const option = document.createElement('option');
+        option.value = project.id;
+        option.textContent = project.name;
+        optgroup.appendChild(option);
+      });
+      select.appendChild(optgroup);
+    });
+
+    formGroup.append(label, select);
+
+    const handleConfirm = () => {
+      const projectId = select.value;
+      if (!projectId) {
+        select.classList.add('error');
+        return;
+      }
+      const project = findProject(projectId);
+      if (!project) {
+        showNotification('Project not found.', 'error');
+        return;
+      }
+      store.update(id, { projectId, areaId: findAreaByProject(projectId)?.id, status: 'active' });
+      renderAll();
+      resolve();
+    };
+
+    return { content: formGroup, onConfirm: handleConfirm };
+  });
+
+  document.body.appendChild(modal);
+  document.querySelector('.modal-overlay').focus();
+}
+
+function createModal(title, contentBuilder) {
+  const modal = document.createElement('div');
+  modal.className = 'modal';
+
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) closeModal(modal);
+  });
+
+  const dialog = document.createElement('div');
+  dialog.className = 'modal-dialog';
+  dialog.setAttribute('role', 'dialog');
+  dialog.setAttribute('aria-modal', 'true');
+  dialog.setAttribute('aria-labelledby', 'modal-title');
+
+  const header = document.createElement('div');
+  header.className = 'modal-header';
+
+  const dialogTitle = document.createElement('h3');
+  dialogTitle.id = 'modal-title';
+  dialogTitle.textContent = title;
+
+  const closeBtn = document.createElement('button');
+  closeBtn.className = 'modal-close';
+  closeBtn.textContent = '×';
+  closeBtn.setAttribute('aria-label', 'Close dialog');
+  closeBtn.addEventListener('click', () => closeModal(modal));
+
+  header.append(dialogTitle, closeBtn);
+
+  const body = document.createElement('div');
+  body.className = 'modal-body';
+
+  const { content, onConfirm } = contentBuilder(() => closeModal(modal));
+  body.appendChild(content);
+
+  const footer = document.createElement('div');
+  footer.className = 'modal-footer';
+
+  const cancelBtn = document.createElement('button');
+  cancelBtn.textContent = 'Cancel';
+  cancelBtn.addEventListener('click', () => closeModal(modal));
+
+  const confirmBtn = document.createElement('button');
+  confirmBtn.className = 'primary';
+  confirmBtn.textContent = 'Confirm';
+  confirmBtn.addEventListener('click', onConfirm);
+
+  footer.append(cancelBtn, confirmBtn);
+
+  dialog.append(header, body, footer);
+  overlay.appendChild(dialog);
+  modal.appendChild(overlay);
+
+  return modal;
+}
+
+function closeModal(modal) {
+  modal.remove();
+}
+
+function showNotification(message, type = 'info') {
+  const notification = document.createElement('div');
+  notification.className = `notification notification-${type}`;
+  notification.textContent = message;
+  document.body.appendChild(notification);
+  setTimeout(() => notification.remove(), 4000);
 }
 
 function exportData() {
@@ -683,8 +1009,8 @@ function renderEngage() {
   const completedToday = store.objects.filter(obj => {
     if (obj.status !== 'done') return false;
     const completedDate = new Date(obj.completedAt || obj.capturedAt);
-    completedDate.setHours(0, 0, 0, 0);
-    return completedDate.getTime() === today.getTime();
+    const completedDateOnly = new Date(completedDate.getFullYear(), completedDate.getMonth(), completedDate.getDate());
+    return completedDateOnly.getTime() === today.getTime();
   });
 
   dom.completedToday.innerHTML = '';
@@ -722,15 +1048,35 @@ function setCurrentFocus(taskId) {
   const task = store.objects.find(obj => obj.id === taskId);
   if (!task) return;
 
-  // Update the focus area
-  dom.currentFocus.innerHTML = `
-    <h3 class="focus-task-title">${task.title}</h3>
-    <p class="focus-task-details">${task.body || 'No details'}</p>
-    <div class="focus-actions">
-      <button class="primary" onclick="completeCurrentFocus('${taskId}')">✓ Complete</button>
-      <button onclick="clearCurrentFocus()">Cancel</button>
-    </div>
-  `;
+  // Create buttons as DOM elements instead of using innerHTML
+  const focusContainer = document.createElement('div');
+  focusContainer.className = 'focus-content';
+
+  const title = document.createElement('h3');
+  title.className = 'focus-task-title';
+  title.textContent = task.title;
+
+  const details = document.createElement('p');
+  details.className = 'focus-task-details';
+  details.textContent = task.body || 'No details';
+
+  const actions = document.createElement('div');
+  actions.className = 'focus-actions';
+
+  const completeBtn = document.createElement('button');
+  completeBtn.className = 'primary';
+  completeBtn.textContent = '✓ Complete';
+  completeBtn.addEventListener('click', () => completeCurrentFocus(taskId));
+
+  const cancelBtn = document.createElement('button');
+  cancelBtn.textContent = 'Cancel';
+  cancelBtn.addEventListener('click', clearCurrentFocus);
+
+  actions.append(completeBtn, cancelBtn);
+  focusContainer.append(title, details, actions);
+
+  dom.currentFocus.innerHTML = '';
+  dom.currentFocus.appendChild(focusContainer);
 
   // Store current focus in state
   state.currentFocusId = taskId;
@@ -743,17 +1089,24 @@ function completeCurrentFocus(taskId) {
 
 function clearCurrentFocus() {
   state.currentFocusId = null;
-  dom.currentFocus.innerHTML = `
-    <p class="focus-label">No active focus</p>
-    <button id="pick-focus" class="primary">Pick a Task</button>
-  `;
-  // Re-bind the pick focus button
-  document.getElementById('pick-focus').addEventListener('click', pickFocusTask);
-}
 
-// Make functions globally available for inline onclick handlers
-window.completeCurrentFocus = completeCurrentFocus;
-window.clearCurrentFocus = clearCurrentFocus;
+  const focusContainer = document.createElement('div');
+  focusContainer.className = 'focus-content';
+
+  const label = document.createElement('p');
+  label.className = 'focus-label';
+  label.textContent = 'No active focus';
+
+  const pickBtn = document.createElement('button');
+  pickBtn.className = 'primary';
+  pickBtn.textContent = 'Pick a Task';
+  pickBtn.addEventListener('click', pickFocusTask);
+
+  focusContainer.append(label, pickBtn);
+
+  dom.currentFocus.innerHTML = '';
+  dom.currentFocus.appendChild(focusContainer);
+}
 
 // Placeholder hooks for Google Drive / Apps Script sync.
 export async function pushToDrive(object) {
