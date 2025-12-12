@@ -109,7 +109,14 @@ const store = new CoreStore();
 const state = {
   para: { areas: [] },
   activeFilter: 'all',
-  searchQuery: ''
+  searchQuery: '',
+  selectedTag: null,
+  advancedFilters: {
+    area: '',
+    project: '',
+    energy: '',
+    sortBy: 'date-created'
+  }
 };
 
 const dom = {};
@@ -119,6 +126,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   await loadParaMetadata();
   store.load();
   populateAreaProjectSelects();
+  populateAdvancedFilters();
   bindEvents();
   renderAll();
 });
@@ -137,6 +145,14 @@ function assignDomRefs() {
   dom.completeWeekly = document.getElementById('complete-weekly');
   dom.searchInput = document.getElementById('search-input');
   dom.clearAllButton = document.getElementById('clear-all-data');
+
+  // Advanced filter elements
+  dom.areaFilter = document.getElementById('area-filter');
+  dom.projectFilter = document.getElementById('project-filter');
+  dom.energyFilter = document.getElementById('energy-filter');
+  dom.sortFilter = document.getElementById('sort-filter');
+  dom.filterResultsCount = document.getElementById('filter-results-count');
+  dom.archivedList = document.getElementById('archived-list');
 
   // Tab navigation elements
   dom.tabButtons = document.querySelectorAll('.tab-btn');
@@ -230,6 +246,28 @@ function populateAreaProjectSelects() {
   dom.projectSelect.innerHTML = projectOptions.join('');
 }
 
+function populateAdvancedFilters() {
+  // Populate area filter
+  if (dom.areaFilter) {
+    const areaOptions = ['<option value="">All Areas</option>'];
+    state.para.areas.forEach((area) => {
+      areaOptions.push(`<option value="${area.id}">${area.name}</option>`);
+    });
+    dom.areaFilter.innerHTML = areaOptions.join('');
+  }
+
+  // Populate project filter
+  if (dom.projectFilter) {
+    const projectOptions = ['<option value="">All Projects</option>'];
+    state.para.areas.forEach((area) => {
+      area.projects.forEach((project) => {
+        projectOptions.push(`<option value="${project.id}">${project.name}</option>`);
+      });
+    });
+    dom.projectFilter.innerHTML = projectOptions.join('');
+  }
+}
+
 // Tab Navigation Management
 function initTabNavigation() {
   // Restore active tab from localStorage
@@ -320,6 +358,35 @@ function bindEvents() {
       clearTimeout(searchTimeout);
       state.searchQuery = e.target.value.toLowerCase();
       searchTimeout = setTimeout(() => renderOrganizedList(), 150);
+    });
+  }
+
+  // Advanced filters
+  if (dom.areaFilter) {
+    dom.areaFilter.addEventListener('change', (e) => {
+      state.advancedFilters.area = e.target.value;
+      renderOrganizedList();
+    });
+  }
+
+  if (dom.projectFilter) {
+    dom.projectFilter.addEventListener('change', (e) => {
+      state.advancedFilters.project = e.target.value;
+      renderOrganizedList();
+    });
+  }
+
+  if (dom.energyFilter) {
+    dom.energyFilter.addEventListener('change', (e) => {
+      state.advancedFilters.energy = e.target.value;
+      renderOrganizedList();
+    });
+  }
+
+  if (dom.sortFilter) {
+    dom.sortFilter.addEventListener('change', (e) => {
+      state.advancedFilters.sortBy = e.target.value;
+      renderOrganizedList();
     });
   }
 
@@ -441,6 +508,7 @@ function renderAll() {
   renderInbox();
   renderParaTree();
   renderOrganizedList();
+  renderArchived();
   renderReview();
   renderEngage();
   updateOrganizeBadge();
@@ -507,6 +575,59 @@ function renderOrganizedList(projectFilter = null) {
     });
   }
 
+  // Apply area filter
+  if (state.advancedFilters.area) {
+    list = list.filter((obj) => obj.areaId === state.advancedFilters.area);
+  }
+
+  // Apply project filter (from advanced filter)
+  if (state.advancedFilters.project) {
+    list = list.filter((obj) => obj.projectId === state.advancedFilters.project);
+  }
+
+  // Apply energy filter
+  if (state.advancedFilters.energy) {
+    list = list.filter((obj) => obj.energyLevel === state.advancedFilters.energy);
+  }
+
+  // Apply tag filter
+  if (state.selectedTag) {
+    list = list.filter((obj) => obj.tags?.includes(state.selectedTag));
+  }
+
+  // Apply sorting
+  const sortBy = state.advancedFilters.sortBy;
+  if (sortBy === 'due-date') {
+    list.sort((a, b) => {
+      const aDate = a.dueAt ? new Date(a.dueAt) : new Date('9999-01-01');
+      const bDate = b.dueAt ? new Date(b.dueAt) : new Date('9999-01-01');
+      return aDate - bDate;
+    });
+  } else if (sortBy === 'priority') {
+    list.sort((a, b) => b.priorityScore - a.priorityScore);
+  } else if (sortBy === 'title') {
+    list.sort((a, b) => a.title.localeCompare(b.title));
+  } else {
+    // date-created (default)
+    list.sort((a, b) => new Date(b.capturedAt) - new Date(a.capturedAt));
+  }
+
+  // Update result count
+  if (dom.filterResultsCount) {
+    if (list.length === 0) {
+      dom.filterResultsCount.textContent = state.searchQuery ? 'No items match your search.' : '';
+    } else {
+      const typeCount = {
+        task: list.filter((obj) => obj.type === 'task').length,
+        idea: list.filter((obj) => obj.type === 'idea').length,
+        note: list.filter((obj) => obj.type === 'note').length,
+        media: list.filter((obj) => obj.type === 'media').length
+      };
+      const countText = `Showing ${list.length} items`;
+      dom.filterResultsCount.textContent = countText;
+    }
+  }
+
   if (!list.length) {
     dom.organizedList.textContent = state.searchQuery ? 'No items match your search.' : 'Nothing here yet.';
     return;
@@ -514,6 +635,77 @@ function renderOrganizedList(projectFilter = null) {
   const fragment = document.createDocumentFragment();
   list.forEach((object) => fragment.appendChild(buildCard(object)));
   dom.organizedList.appendChild(fragment);
+}
+
+function renderArchived() {
+  if (!dom.archivedList) return;
+  dom.archivedList.innerHTML = '';
+  const archived = store.objects.filter((obj) => obj.status === 'archived');
+
+  if (!archived.length) {
+    dom.archivedList.textContent = 'No archived items.';
+    return;
+  }
+
+  const fragment = document.createDocumentFragment();
+  archived.forEach((object) => {
+    const card = buildCard(object);
+    // Replace delete button with restore button
+    const actions = card.querySelector('.card-actions');
+    actions.innerHTML = '';
+    actions.appendChild(actionButton('Restore', () => restoreObject(object.id)));
+    actions.appendChild(actionButton('Delete Permanently', () => permanentlyDeleteObject(object.id)));
+    fragment.appendChild(card);
+  });
+  dom.archivedList.appendChild(fragment);
+}
+
+function restoreObject(id) {
+  const object = store.objects.find((obj) => obj.id === id);
+  if (!object) {
+    showNotification('Item not found.', 'error');
+    return;
+  }
+  store.update(id, { status: 'inbox' });
+  renderAll();
+  showNotification('Item restored to Inbox', 'success');
+}
+
+function permanentlyDeleteObject(id) {
+  const object = store.objects.find((obj) => obj.id === id);
+  if (!object) {
+    showNotification('Item not found.', 'error');
+    return;
+  }
+
+  const modal = createModal('Permanently Delete Item', (resolve) => {
+    const content = document.createElement('div');
+    content.className = 'modal-form-group';
+
+    const message = document.createElement('p');
+    message.textContent = `Permanently delete "${object.title}"? This cannot be undone.`;
+    message.style.marginBottom = '20px';
+    message.style.fontWeight = 'bold';
+    message.style.color = '#d32f2f';
+    content.appendChild(message);
+
+    const handleConfirm = () => {
+      store.delete(id);
+      renderAll();
+      showNotification('Item permanently deleted', 'success');
+      resolve();
+    };
+
+    return { content, onConfirm: handleConfirm };
+  });
+
+  const footer = modal.querySelector('.modal-footer');
+  const confirmBtn = footer.querySelector('.primary');
+  confirmBtn.textContent = 'Permanently Delete';
+  confirmBtn.classList.add('danger');
+
+  document.body.appendChild(modal);
+  document.querySelector('.modal-overlay').focus();
 }
 
 function renderReview() {
@@ -626,14 +818,34 @@ function buildCard(object, options = {}) {
   typePill.textContent = object.type;
   typePill.classList.add(object.type);
   statusPill.textContent = formatStatus(object.status);
-  card.querySelector('.object-title').textContent = object.title;
-  card.querySelector('.object-body').textContent = object.body || 'No description yet.';
+
+  // Add energy badge
+  const cardMeta = card.querySelector('.card-meta');
+  if (object.energyLevel) {
+    const energyBadge = document.createElement('span');
+    energyBadge.className = `energy-badge energy-${object.energyLevel}`;
+    energyBadge.textContent = object.energyLevel;
+    cardMeta.appendChild(energyBadge);
+  }
+
+  const titleEl = card.querySelector('.object-title');
+  titleEl.textContent = object.title;
+  titleEl.style.cursor = 'pointer';
+  titleEl.addEventListener('click', () => viewItemDetails(object.id));
+
+  // Display next action if it exists
+  const bodyEl = card.querySelector('.object-body');
+  if (object.nextAction) {
+    bodyEl.innerHTML = `<strong>Next:</strong> ${object.nextAction}`;
+  } else {
+    bodyEl.textContent = object.body || 'No description yet.';
+  }
 
   const detailMap = {
     Area: lookupAreaName(object.areaId) || 'Inbox',
     Project: lookupProjectName(object.projectId) || 'Unassigned',
-    'Due / Priority': `${object.dueAt ? formatDate(object.dueAt) : '—'} / ${object.priorityScore}`,
-    Tags: object.tags?.length ? object.tags.join(', ') : '—'
+    'Due Date': object.dueAt ? formatDate(object.dueAt) : '—',
+    Priority: object.priorityScore
   };
   const dl = card.querySelector('.object-details');
   Object.entries(detailMap).forEach(([key, value]) => {
@@ -641,20 +853,53 @@ function buildCard(object, options = {}) {
     dt.textContent = key;
     const dd = document.createElement('dd');
     dd.textContent = value;
+
+    // Highlight overdue dates in red
+    if (key === 'Due Date' && object.dueAt) {
+      const dueDate = new Date(object.dueAt);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      dueDate.setHours(0, 0, 0, 0);
+      if (dueDate < today) {
+        dd.style.color = '#d32f2f';
+        dd.style.fontWeight = '600';
+      }
+    }
+
     dl.append(dt, dd);
   });
 
+  // Add clickable tags
+  if (object.tags?.length) {
+    const dt = document.createElement('dt');
+    dt.textContent = 'Tags';
+    const dd = document.createElement('dd');
+    object.tags.forEach((tag) => {
+      const tagEl = document.createElement('span');
+      tagEl.className = `clickable-tag ${state.selectedTag === tag ? 'active' : ''}`;
+      tagEl.textContent = tag;
+      tagEl.addEventListener('click', (e) => {
+        e.stopPropagation();
+        state.selectedTag = state.selectedTag === tag ? null : tag;
+        renderOrganizedList();
+      });
+      dd.appendChild(tagEl);
+    });
+    dl.append(dt, dd);
+  }
+
   const actions = card.querySelector('.card-actions');
+  actions.appendChild(actionButton('Edit', () => editObject(object.id)));
   actions.appendChild(actionButton('Complete', () => markComplete(object.id)));
   if (object.status === 'inbox') {
     actions.appendChild(actionButton('Move to Next', () => updateStatus(object.id, 'next')));
-    actions.appendChild(actionButton('Delete', () => deleteObject(object.id)));
   } else if (object.status !== 'done') {
     actions.appendChild(actionButton('Snooze', () => snoozeObject(object.id)));
   }
   if (options.showAssign) {
     actions.appendChild(actionButton('Assign Project', () => promptAssign(object.id)));
   }
+  actions.appendChild(actionButton('Delete', () => deleteObject(object.id)));
   return card;
 }
 
@@ -677,8 +922,41 @@ function updateStatus(id, status) {
 }
 
 function deleteObject(id) {
-  store.delete(id);
-  renderAll();
+  const object = store.objects.find((obj) => obj.id === id);
+  if (!object) {
+    showNotification('Item not found.', 'error');
+    return;
+  }
+  showDeleteConfirmation(id, object.title);
+}
+
+function showDeleteConfirmation(id, title) {
+  const modal = createModal('Archive Item', (resolve) => {
+    const content = document.createElement('div');
+    content.className = 'modal-form-group';
+
+    const message = document.createElement('p');
+    message.textContent = `Archive "${title}"? You can restore it later from the Archived section.`;
+    message.style.marginBottom = '20px';
+    content.appendChild(message);
+
+    const handleConfirm = () => {
+      store.update(id, { status: 'archived' });
+      renderAll();
+      showNotification('Item archived. You can restore it in the Archived section.', 'success');
+      resolve();
+    };
+
+    return { content, onConfirm: handleConfirm };
+  });
+
+  const footer = modal.querySelector('.modal-footer');
+  const confirmBtn = footer.querySelector('.primary');
+  confirmBtn.textContent = 'Archive';
+  confirmBtn.classList.add('danger');
+
+  document.body.appendChild(modal);
+  document.querySelector('.modal-overlay').focus();
 }
 
 function snoozeObject(id) {
@@ -687,6 +965,148 @@ function snoozeObject(id) {
 
 function promptAssign(id) {
   showAssignModal(id);
+}
+
+function editObject(id) {
+  showEditModal(id);
+}
+
+function viewItemDetails(id) {
+  showDetailView(id);
+}
+
+function showDetailView(id) {
+  const object = store.objects.find((obj) => obj.id === id);
+  if (!object) {
+    showNotification('Item not found.', 'error');
+    return;
+  }
+
+  const modal = createModal(object.title, (resolve) => {
+    const content = document.createElement('div');
+    content.className = 'detail-view-content';
+
+    // Item type and status
+    const headerDiv = document.createElement('div');
+    headerDiv.style.marginBottom = '20px';
+
+    const typeSpan = document.createElement('span');
+    typeSpan.textContent = object.type.charAt(0).toUpperCase() + object.type.slice(1);
+    typeSpan.className = `pill ${object.type}`;
+    typeSpan.style.marginRight = '10px';
+
+    const statusSpan = document.createElement('span');
+    statusSpan.textContent = formatStatus(object.status);
+    statusSpan.className = 'pill status-pill';
+
+    headerDiv.append(typeSpan, statusSpan);
+    content.appendChild(headerDiv);
+
+    // Body/Description
+    if (object.body) {
+      const bodySection = document.createElement('div');
+      bodySection.style.marginBottom = '20px';
+      const bodyTitle = document.createElement('h4');
+      bodyTitle.textContent = 'Description';
+      bodyTitle.style.marginBottom = '8px';
+      const bodyText = document.createElement('p');
+      bodyText.textContent = object.body;
+      bodyText.style.whiteSpace = 'pre-wrap';
+      bodySection.append(bodyTitle, bodyText);
+      content.appendChild(bodySection);
+    }
+
+    // Next Action
+    if (object.nextAction) {
+      const nextActionSection = document.createElement('div');
+      nextActionSection.style.marginBottom = '20px';
+      const nextActionTitle = document.createElement('h4');
+      nextActionTitle.textContent = 'Next Action';
+      nextActionTitle.style.marginBottom = '8px';
+      const nextActionText = document.createElement('p');
+      nextActionText.textContent = object.nextAction;
+      nextActionText.style.fontWeight = '500';
+      nextActionSection.append(nextActionTitle, nextActionText);
+      content.appendChild(nextActionSection);
+    }
+
+    // Details grid
+    const detailsDiv = document.createElement('div');
+    detailsDiv.style.marginBottom = '20px';
+    detailsDiv.style.display = 'grid';
+    detailsDiv.style.gridTemplateColumns = '1fr 1fr';
+    detailsDiv.style.gap = '15px';
+
+    const detailItems = [
+      { label: 'Area', value: lookupAreaName(object.areaId) || 'Inbox' },
+      { label: 'Project', value: lookupProjectName(object.projectId) || 'Unassigned' },
+      { label: 'Due Date', value: object.dueAt ? formatDate(object.dueAt) : 'No due date' },
+      { label: 'Priority', value: object.priorityScore },
+      { label: 'Energy', value: object.energyLevel?.charAt(0).toUpperCase() + object.energyLevel?.slice(1) || '—' },
+      { label: 'Est. Time', value: object.estimatedEffortMins ? `${object.estimatedEffortMins} mins` : '—' }
+    ];
+
+    detailItems.forEach(({ label, value }) => {
+      const item = document.createElement('div');
+      item.style.padding = '10px';
+      item.style.backgroundColor = '#f5f5f5';
+      item.style.borderRadius = '6px';
+
+      const labelEl = document.createElement('div');
+      labelEl.textContent = label;
+      labelEl.style.fontSize = '0.85em';
+      labelEl.style.color = '#666';
+      labelEl.style.marginBottom = '4px';
+
+      const valueEl = document.createElement('div');
+      valueEl.textContent = value;
+      valueEl.style.fontWeight = '500';
+
+      item.append(labelEl, valueEl);
+      detailsDiv.appendChild(item);
+    });
+
+    content.appendChild(detailsDiv);
+
+    // Tags
+    if (object.tags?.length) {
+      const tagsSection = document.createElement('div');
+      tagsSection.style.marginBottom = '20px';
+      const tagsTitle = document.createElement('h4');
+      tagsTitle.textContent = 'Tags';
+      tagsTitle.style.marginBottom = '8px';
+      const tagsDiv = document.createElement('div');
+      tagsDiv.style.display = 'flex';
+      tagsDiv.style.gap = '8px';
+      tagsDiv.style.flexWrap = 'wrap';
+
+      object.tags.forEach((tag) => {
+        const tagEl = document.createElement('span');
+        tagEl.textContent = tag;
+        tagEl.style.backgroundColor = '#e8e8e8';
+        tagEl.style.padding = '4px 12px';
+        tagEl.style.borderRadius = '20px';
+        tagEl.style.fontSize = '0.9em';
+        tagsDiv.appendChild(tagEl);
+      });
+
+      tagsSection.append(tagsTitle, tagsDiv);
+      content.appendChild(tagsSection);
+    }
+
+    const handleConfirm = () => {
+      showEditModal(id);
+    };
+
+    return { content, onConfirm: handleConfirm };
+  });
+
+  const footer = modal.querySelector('.modal-footer');
+  const confirmBtn = footer.querySelector('.primary');
+  confirmBtn.textContent = 'Edit';
+
+  document.body.appendChild(modal);
+  document.querySelector('.modal-overlay').focus();
 }
 
 function showSnoozeModal(id) {
@@ -763,6 +1183,208 @@ function showAssignModal(id) {
     };
 
     return { content: formGroup, onConfirm: handleConfirm };
+  });
+
+  document.body.appendChild(modal);
+  document.querySelector('.modal-overlay').focus();
+}
+
+function showEditModal(id) {
+  const object = store.objects.find((obj) => obj.id === id);
+  if (!object) {
+    showNotification('Item not found.', 'error');
+    return;
+  }
+
+  const modal = createModal('Edit Item', (resolve) => {
+    const form = document.createElement('form');
+    form.className = 'modal-form';
+
+    // Title field
+    const titleGroup = document.createElement('div');
+    titleGroup.className = 'modal-form-group';
+    const titleLabel = document.createElement('label');
+    titleLabel.textContent = 'Title';
+    const titleInput = document.createElement('input');
+    titleInput.type = 'text';
+    titleInput.value = object.title;
+    titleInput.required = true;
+    titleGroup.append(titleLabel, titleInput);
+
+    // Type field
+    const typeGroup = document.createElement('div');
+    typeGroup.className = 'modal-form-group';
+    const typeLabel = document.createElement('label');
+    typeLabel.textContent = 'Type';
+    const typeSelect = document.createElement('select');
+    typeSelect.innerHTML = '<option value="task">Task</option><option value="idea">Idea</option><option value="note">Note</option><option value="media">Media</option>';
+    typeSelect.value = object.type;
+    typeGroup.append(typeLabel, typeSelect);
+
+    // Body field
+    const bodyGroup = document.createElement('div');
+    bodyGroup.className = 'modal-form-group';
+    const bodyLabel = document.createElement('label');
+    bodyLabel.textContent = 'Details';
+    const bodyTextarea = document.createElement('textarea');
+    bodyTextarea.value = object.body;
+    bodyTextarea.rows = 3;
+    bodyGroup.append(bodyLabel, bodyTextarea);
+
+    // Due date field
+    const dueGroup = document.createElement('div');
+    dueGroup.className = 'modal-form-group';
+    const dueLabel = document.createElement('label');
+    dueLabel.textContent = 'Due Date';
+    const dueInput = document.createElement('input');
+    dueInput.type = 'date';
+    if (object.dueAt) {
+      dueInput.value = object.dueAt.split('T')[0];
+    }
+    dueGroup.append(dueLabel, dueInput);
+
+    // Effort field
+    const effortGroup = document.createElement('div');
+    effortGroup.className = 'modal-form-group';
+    const effortLabel = document.createElement('label');
+    effortLabel.textContent = 'Est. Time (mins)';
+    const effortInput = document.createElement('input');
+    effortInput.type = 'number';
+    effortInput.min = '1';
+    effortInput.max = '480';
+    if (object.estimatedEffortMins) {
+      effortInput.value = object.estimatedEffortMins;
+    }
+    effortGroup.append(effortLabel, effortInput);
+
+    // Energy field
+    const energyGroup = document.createElement('div');
+    energyGroup.className = 'modal-form-group';
+    const energyLabel = document.createElement('label');
+    energyLabel.textContent = 'Energy Level';
+    const energySelect = document.createElement('select');
+    energySelect.innerHTML = '<option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option>';
+    energySelect.value = object.energyLevel;
+    energyGroup.append(energyLabel, energySelect);
+
+    // Area field
+    const areaGroup = document.createElement('div');
+    areaGroup.className = 'modal-form-group';
+    const areaLabel = document.createElement('label');
+    areaLabel.textContent = 'Area';
+    const areaSelect = document.createElement('select');
+    areaSelect.innerHTML = '<option value="">-- None --</option>';
+    state.para.areas.forEach((area) => {
+      const option = document.createElement('option');
+      option.value = area.id;
+      option.textContent = area.name;
+      areaSelect.appendChild(option);
+    });
+    if (object.areaId) {
+      areaSelect.value = object.areaId;
+    }
+    areaGroup.append(areaLabel, areaSelect);
+
+    // Project field
+    const projectGroup = document.createElement('div');
+    projectGroup.className = 'modal-form-group';
+    const projectLabel = document.createElement('label');
+    projectLabel.textContent = 'Project';
+    const projectSelect = document.createElement('select');
+    projectSelect.innerHTML = '<option value="">-- None --</option>';
+    state.para.areas.forEach((area) => {
+      const optgroup = document.createElement('optgroup');
+      optgroup.label = area.name;
+      area.projects.forEach((project) => {
+        const option = document.createElement('option');
+        option.value = project.id;
+        option.textContent = project.name;
+        optgroup.appendChild(option);
+      });
+      projectSelect.appendChild(optgroup);
+    });
+    if (object.projectId) {
+      projectSelect.value = object.projectId;
+    }
+    projectGroup.append(projectLabel, projectSelect);
+
+    // Tags field
+    const tagsGroup = document.createElement('div');
+    tagsGroup.className = 'modal-form-group';
+    const tagsLabel = document.createElement('label');
+    tagsLabel.textContent = 'Tags (comma separated)';
+    const tagsInput = document.createElement('input');
+    tagsInput.type = 'text';
+    tagsInput.value = object.tags?.join(', ') || '';
+    tagsGroup.append(tagsLabel, tagsInput);
+
+    // Next Action field
+    const nextActionGroup = document.createElement('div');
+    nextActionGroup.className = 'modal-form-group';
+    const nextActionLabel = document.createElement('label');
+    nextActionLabel.textContent = 'Next Action';
+    const nextActionInput = document.createElement('input');
+    nextActionInput.type = 'text';
+    nextActionInput.value = object.nextAction || '';
+    nextActionGroup.append(nextActionLabel, nextActionInput);
+
+    form.append(titleGroup, typeGroup, bodyGroup, dueGroup, effortGroup, energyGroup, areaGroup, projectGroup, tagsGroup, nextActionGroup);
+
+    const handleConfirm = () => {
+      const newTitle = titleInput.value.trim();
+      if (!newTitle) {
+        showNotification('Title is required', 'error');
+        return;
+      }
+
+      const effort = effortInput.value ? Number(effortInput.value) : null;
+      if (effort && (isNaN(effort) || effort < 1 || effort > 480)) {
+        showNotification('Estimated effort must be between 1 and 480 minutes', 'error');
+        return;
+      }
+
+      const due = dueInput.value;
+      if (due) {
+        const dueDate = new Date(due);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        dueDate.setHours(0, 0, 0, 0);
+        if (dueDate < today) {
+          showNotification('Due date cannot be in the past', 'error');
+          return;
+        }
+      }
+
+      const tags = (tagsInput.value || '')
+        .split(',')
+        .map((tag) => tag.trim())
+        .filter(Boolean);
+
+      const updates = {
+        title: newTitle,
+        type: typeSelect.value,
+        body: bodyTextarea.value,
+        dueAt: due ? new Date(due).toISOString() : null,
+        estimatedEffortMins: effort,
+        energyLevel: energySelect.value,
+        areaId: areaSelect.value || null,
+        projectId: projectSelect.value || null,
+        tags,
+        nextAction: nextActionInput.value
+      };
+
+      // Recalculate priority if effort or due date changed
+      if (object.estimatedEffortMins !== effort || object.dueAt !== updates.dueAt) {
+        updates.priorityScore = calculatePriority({ due, effort, type: updates.type });
+      }
+
+      store.update(id, updates);
+      renderAll();
+      showNotification('Item updated successfully', 'success');
+      resolve();
+    };
+
+    return { content: form, onConfirm: handleConfirm };
   });
 
   document.body.appendChild(modal);

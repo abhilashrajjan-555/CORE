@@ -1257,3 +1257,111 @@ form {
   border-color: var(--accent-primary);
   box-shadow: 0 0 0 2px rgba(55, 53, 47, 0.08);
 }
+
+/* Advanced Filters */
+.advanced-filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin: 1rem 0;
+  padding: 1rem;
+  background: var(--bg-secondary);
+  border-radius: 0.5rem;
+  border: 1px solid var(--glass-border);
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.filter-group label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.filter-group select {
+  padding: 0.5rem 0.75rem;
+  background: var(--bg-primary);
+  border: 1px solid var(--glass-border);
+  border-radius: 0.4rem;
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.filter-group select:hover {
+  border-color: var(--accent-primary);
+  background: var(--bg-primary);
+}
+
+.filter-group select:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 2px rgba(55, 53, 47, 0.08);
+}
+
+.filter-results-count {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+  font-style: italic;
+}
+
+/* Energy Level Badges */
+.energy-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.25rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.energy-high {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.energy-medium {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.energy-low {
+  background-color: #dbeafe;
+  color: #0c2d6b;
+}
+
+/* Clickable Tags */
+.clickable-tag {
+  display: inline-block;
+  background-color: #e8e8e8;
+  color: #333;
+  padding: 0.3rem 0.6rem;
+  border-radius: 0.25rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  border: 1px solid transparent;
+  margin-right: 0.5rem;
+  margin-bottom: 0.3rem;
+}
+
+.clickable-tag:hover {
+  background-color: #d0d0d0;
+  border-color: var(--accent-primary);
+}
+
+.clickable-tag.active {
+  background-color: var(--accent-primary);
+  color: white;
+  border-color: var(--accent-primary);
+}

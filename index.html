@@ -142,7 +142,45 @@
             aria-label="Search items by title or tags"
           />
         </div>
+        <div class="advanced-filters">
+          <div class="filter-group">
+            <label for="area-filter">Area</label>
+            <select id="area-filter">
+              <option value="">All Areas</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="project-filter">Project</label>
+            <select id="project-filter">
+              <option value="">All Projects</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="energy-filter">Energy</label>
+            <select id="energy-filter">
+              <option value="">All Levels</option>
+              <option value="high">High</option>
+              <option value="medium">Medium</option>
+              <option value="low">Low</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="sort-filter">Sort By</label>
+            <select id="sort-filter">
+              <option value="date-created">Date Created</option>
+              <option value="due-date">Due Date</option>
+              <option value="priority">Priority (High to Low)</option>
+              <option value="title">Title (A-Z)</option>
+            </select>
+          </div>
+        </div>
+        <div id="filter-results-count" class="filter-results-count"></div>
         <div id="organized-list" class="card-list"></div>
+      </div>
+
+      <div class="panel-subsection">
+        <h3>Archived Items</h3>
+        <div id="archived-list" class="card-list"></div>
       </div>
     </section>
 
